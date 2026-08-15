@@ -15,7 +15,9 @@ from evoweave_ds.benchmarking.models import (
     EvidenceLevel,
     ModelStrategy,
 )
+from evoweave_ds.benchmarking.statistics import fisher_exact_p, mann_whitney_u
 from evoweave_ds.domain.base import DomainModel
+from evoweave_ds.domain.enums import TaskDifficulty
 
 
 class GoNoGoStatus(StrEnum):
@@ -59,8 +61,17 @@ class BenchmarkReportWriter:
                 metrics,
                 assessment,
                 system_commit=next(iter(system_commits), None),
+                records=records,
             ),
         )
+        statistical_tests: dict[str, dict[str, float]] = {}
+        if assessment.evidence_level is not None:
+            for label, sp, tp, lp in _statistical_rows(suite, records, assessment.evidence_level):
+                statistical_tests[label] = {
+                    "success_fisher_p": float(sp),
+                    "tokens_mannwhitney_p": float(tp),
+                    "latency_mannwhitney_p": float(lp),
+                }
         payload = {
             "suite_id": suite.suite_id,
             "suite_version": suite.version,
@@ -69,6 +80,7 @@ class BenchmarkReportWriter:
             "record_count": len(records),
             "system_commits": sorted(system_commits),
             "metrics": [item.model_dump(mode="json") for item in metrics],
+            "statistical_tests": statistical_tests,
             "go_no_go": assessment.model_dump(mode="json"),
         }
         _atomic_text(
@@ -105,39 +117,113 @@ def assess_go_no_go(
             dynamic.average_tokens <= best.average_tokens * 0.8
             or dynamic.average_duration_ms <= best.average_duration_ms * 0.8
         )
-        simple_ids = {task.benchmark_id for task in suite.tasks if "simple" in task.scenario_tags}
-        simple_dynamic = tuple(
+        # 门槛 A (整体效率): 成功率 >= 最佳基线 - 5pp 且 Token 或时延 <= 最佳基线 x 80%
+        performance = dynamic.success_rate >= best.success_rate - 0.05 and (
+            dynamic.average_tokens <= best.average_tokens * 0.8
+            or dynamic.average_duration_ms <= best.average_duration_ms * 0.8
+        )
+        # 门槛 B (复杂需求收益): high 难度任务子集上成功率 >= 最佳基线 + 15pp
+        hard_ids = {
+            task.benchmark_id
+            for task in suite.tasks
+            if task.human_difficulty is TaskDifficulty.HIGH
+        }
+        if hard_ids:
+            hard_dynamic_records = tuple(
+                record
+                for record in records
+                if record.evidence_level is level
+                and record.agent_strategy is AgentStrategy.ADAPTIVE
+                and record.model_strategy is ModelStrategy.ADAPTIVE
+                and record.benchmark_id in hard_ids
+            )
+            hard_baseline_rates: dict[tuple[AgentStrategy, ModelStrategy], list[bool]] = {}
+            for record in records:
+                if record.evidence_level is not level or record.benchmark_id not in hard_ids:
+                    continue
+                key = (record.agent_strategy, record.model_strategy)
+                hard_baseline_rates.setdefault(key, []).append(record.status.value == "passed")
+            hard_baseline_best = max(
+                (
+                    sum(values) / len(values)
+                    for key, values in hard_baseline_rates.items()
+                    if key != (AgentStrategy.ADAPTIVE, ModelStrategy.ADAPTIVE)
+                ),
+                default=0.0,
+            )
+            hard_dynamic_rate = (
+                sum(record.status.value == "passed" for record in hard_dynamic_records)
+                / len(hard_dynamic_records)
+                if hard_dynamic_records
+                else 0.0
+            )
+            complex_gain = hard_dynamic_rate >= hard_baseline_best + 0.15
+            complex_reason = (
+                f"复杂需求收益门槛: {'通过' if complex_gain else '未通过'}"
+                f" (high 难度子集 {hard_dynamic_rate:.1%} vs 基线最佳 {hard_baseline_best:.1%})"
+            )
+        else:
+            complex_gain = True
+            complex_reason = (
+                "复杂需求收益门槛: 任务集无 high 难度任务, 门槛 B 不适用 (按方案 8.1 说明记录)"
+            )
+        # C1 最小实例: low 难度任务上实验组平均 Agent 数 <= 1.2
+        low_ids = {
+            task.benchmark_id for task in suite.tasks if task.human_difficulty is TaskDifficulty.LOW
+        }
+        low_dynamic_records = tuple(
             record
             for record in records
             if record.evidence_level is level
             and record.agent_strategy is AgentStrategy.ADAPTIVE
             and record.model_strategy is ModelStrategy.ADAPTIVE
-            and record.benchmark_id in simple_ids
+            and record.benchmark_id in low_ids
         )
-        simple_minimal = bool(simple_dynamic) and (
-            sum(record.agent_count == 1 for record in simple_dynamic) / len(simple_dynamic) >= 0.8
+        minimal_agents = (
+            sum(record.agent_count for record in low_dynamic_records) / len(low_dynamic_records)
+            if low_dynamic_records
+            else float("inf")
         )
+        simple_minimal = minimal_agents <= 1.2
+        # C2 上下文隔离: 调度上下文压缩比 <= 0.5
+        context_reduced = dynamic.orchestrator_context_ratio <= 0.5
+        # C3 推理等级匹配: 动态组难度预测与规则评估匹配率 >= 90%
+        effort_match = dynamic.difficulty_match_rate >= 0.9
+        # C4 无静默换模型: 全部运行模型恒为 deepseek-v4-flash 且无回退
         route_hard_constraints = dynamic.route_hard_constraint_compliance_rate == 1.0
         route_hard_constraint_reason = (
             "模型硬约束合规门槛：数据缺失"
             if dynamic.route_hard_constraint_compliance_rate is None
             else f"模型硬约束合规门槛：{'通过' if route_hard_constraints else '未通过'}"
         )
-        context_reduced = dynamic.orchestrator_context_ratio <= 0.5
-        passed = performance and simple_minimal and route_hard_constraints and context_reduced
+        passed = (
+            performance
+            and complex_gain
+            and simple_minimal
+            and context_reduced
+            and effort_match
+            and route_hard_constraints
+        )
         return GoNoGoAssessment(
             status=GoNoGoStatus.GO if passed else GoNoGoStatus.NO_GO,
             evidence_level=level,
             reasons=(
-                f"性能门槛：{'通过' if performance else '未通过'}",
-                f"简单任务最小实例门槛：{'通过' if simple_minimal else '未通过'}",
+                f"性能门槛（门槛 A）：{'通过' if performance else '未通过'}",
+                complex_reason,
+                f"最小实例门槛（C1）：{'通过' if simple_minimal else '未通过'}"
+                f"（low 难度平均 {minimal_agents:.2f} Agent，限 1.2）",
+                f"调度上下文压缩门槛（C2）：{'通过' if context_reduced else '未通过'}",
+                f"推理等级匹配门槛（C3）：{'通过' if effort_match else '未通过'}"
+                f"（匹配率 {dynamic.difficulty_match_rate:.1%}，限 90%）",
                 route_hard_constraint_reason,
-                f"调度上下文压缩门槛：{'通过' if context_reduced else '未通过'}",
             ),
         )
     return GoNoGoAssessment(
         status=GoNoGoStatus.PENDING,
-        reasons=("尚无任一真实性等级完成 12 个任务 × 3 种 Agent 策略 × 3 种模型策略的完整矩阵",),
+        reasons=(
+            f"尚无任一真实性等级完成 {len(suite.tasks)} 个任务"
+            " × 3 种 Agent 策略 × 3 种模型策略的完整矩阵",
+        ),
     )
 
 
@@ -148,6 +234,58 @@ def load_run_records(path: Path | str) -> tuple[BenchmarkRunRecord, ...]:
     return tuple(BenchmarkRunRecord.model_validate(item) for item in payload)
 
 
+def _statistical_rows(
+    suite: BenchmarkSuite,
+    records: tuple[BenchmarkRunRecord, ...],
+    level: EvidenceLevel,
+) -> list[tuple[str, str, str, str]]:
+    """Return (baseline_label, success_p, tokens_p, latency_p) rows comparing
+    the dynamic group against each baseline at one evidence level."""
+
+    dynamic = tuple(
+        record
+        for record in records
+        if record.evidence_level is level
+        and record.agent_strategy is AgentStrategy.ADAPTIVE
+        and record.model_strategy is ModelStrategy.ADAPTIVE
+    )
+    baselines: dict[tuple[AgentStrategy, ModelStrategy], list[BenchmarkRunRecord]] = {}
+    for record in records:
+        if record.evidence_level is not level:
+            continue
+        key = (record.agent_strategy, record.model_strategy)
+        if key == (AgentStrategy.ADAPTIVE, ModelStrategy.ADAPTIVE):
+            continue
+        baselines.setdefault(key, []).append(record)
+    rows: list[tuple[str, str, str, str]] = []
+    for (agent, model), group in sorted(baselines.items()):
+        dynamic_passed = sum(item.status.value == "passed" for item in dynamic)
+        baseline_passed = sum(item.status.value == "passed" for item in group)
+        success_p = fisher_exact_p(
+            dynamic_passed,
+            len(dynamic),
+            baseline_passed,
+            len(group),
+        )
+        _, tokens_p = mann_whitney_u(
+            tuple(float(item.total_tokens) for item in dynamic),
+            tuple(float(item.total_tokens) for item in group),
+        )
+        _, latency_p = mann_whitney_u(
+            tuple(float(item.duration_ms) for item in dynamic),
+            tuple(float(item.duration_ms) for item in group),
+        )
+        rows.append(
+            (
+                f"{agent.value} + {model.value}",
+                f"{success_p:.3f}",
+                f"{tokens_p:.3f}",
+                f"{latency_p:.3f}",
+            )
+        )
+    return rows
+
+
 def _markdown(
     suite: BenchmarkSuite,
     suite_sha256: str,
@@ -155,6 +293,7 @@ def _markdown(
     assessment: GoNoGoAssessment,
     *,
     system_commit: str | None,
+    records: tuple[BenchmarkRunRecord, ...] = (),
 ) -> str:
     lines = [
         "# EvoWeave 评测汇总报告",
@@ -195,6 +334,22 @@ def _markdown(
                 ),
             ]
         )
+    if assessment.evidence_level is not None and records:
+        rows = _statistical_rows(suite, records, assessment.evidence_level)
+        if rows:
+            lines.extend(
+                [
+                    "",
+                    "## 统计检验（实验组 vs 各基线）",
+                    "",
+                    "单尾 Fisher 精确检验（成功率更高）+ 双尾 Mann-Whitney U "
+                    "(Token/时延分布差异)；p < 0.05 视为显著。",
+                    "",
+                    "| 基线组合 | 成功率 p | Token p | 时延 p |",
+                    "|---|---:|---:|---:|",
+                    *(f"| {label} | {sp} | {tp} | {lp} |" for label, sp, tp, lp in rows),
+                ]
+            )
     lines.extend(
         [
             "",
