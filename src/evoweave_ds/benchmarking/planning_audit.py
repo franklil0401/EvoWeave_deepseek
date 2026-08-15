@@ -122,7 +122,7 @@ class PlanningAuditWriter:
         adaptive = tuple(
             item for item in report.records if item.agent_strategy is AgentStrategy.ADAPTIVE
         )
-        simple = next(item for item in adaptive if item.benchmark_id == "bench-01-single-file")
+        simple = min(adaptive, key=lambda item: (item.agent_count, item.benchmark_id))
         difficulty_match_count = sum(item.difficulty_match for item in adaptive)
         difficulty_match_rate = difficulty_match_count / len(adaptive)
         lines = [

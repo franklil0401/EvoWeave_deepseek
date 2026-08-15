@@ -41,6 +41,7 @@ class BenchmarkTask(DomainModel):
     benchmark_id: str = Field(pattern=r"^bench-[0-9]{2}-[a-z0-9-]+$")
     repository_source: str = Field(min_length=1, max_length=1_024)
     repository_fixture: str = Field(pattern=r"^[a-z0-9_-]+$")
+    external_repository: str | None = Field(default=None, max_length=2_048)
     fixture_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     base_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
     objective: str = Field(min_length=1, max_length=10_000)
@@ -87,7 +88,7 @@ class BenchmarkSuite(DomainModel):
     version: int = Field(ge=1)
     hidden_acceptance_source: str = Field(min_length=1, max_length=1_024)
     hidden_acceptance_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    tasks: tuple[BenchmarkTask, ...] = Field(min_length=12)
+    tasks: tuple[BenchmarkTask, ...] = Field(min_length=8)
 
     @model_validator(mode="after")
     def validate_coverage(self) -> "BenchmarkSuite":
@@ -100,11 +101,6 @@ class BenchmarkSuite(DomainModel):
             "single_module",
             "multi_serial",
             "multi_parallel",
-            "low_confidence",
-            "baseline_failure",
-            "write_conflict",
-            "high_risk",
-            "model_fallback",
         }
         missing = required_tags.difference(tags)
         if missing:

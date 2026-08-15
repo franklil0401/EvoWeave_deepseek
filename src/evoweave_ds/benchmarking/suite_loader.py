@@ -15,9 +15,26 @@ class SuiteValidationReport(DomainModel):
     suite_id: str
     suite_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     task_count: int = Field(ge=1)
-    fixture_count: int = Field(ge=1)
+    fixture_count: int = Field(ge=0)
     verified_commits: tuple[str, ...]
     verified_hidden_acceptance_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+def _git_commit(repository: Path) -> str:
+    import subprocess
+
+    completed = subprocess.run(
+        ("git", "-C", str(repository), "rev-parse", "HEAD"),
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+    )
+    if completed.returncode != 0:
+        raise ValueError("无法读取外部仓库 HEAD")
+    return completed.stdout.strip()
 
 
 def load_benchmark_suite(path: Path | str) -> tuple[BenchmarkSuite, str]:
@@ -42,7 +59,15 @@ def validate_benchmark_suite(
         raise ValueError("benchmark 隐藏验收摘要漂移")
     fixture_root = (root / "tests/fixtures/repositories").resolve(strict=True)
     fixture_tasks: dict[str, BenchmarkTask] = {}
+    external_tasks: dict[str, BenchmarkTask] = {}
     for task in suite.tasks:
+        if task.external_repository is not None:
+            repository = Path(task.external_repository).resolve(strict=True)
+            commit = _git_commit(repository)
+            if commit != task.base_commit:
+                raise ValueError(f"{task.benchmark_id} 的外部仓库 HEAD 漂移")
+            external_tasks[task.benchmark_id] = task
+            continue
         source = (root / task.repository_source).resolve(strict=True)
         expected_source = (fixture_root / task.repository_fixture).resolve(strict=True)
         if source != expected_source or source.parent != fixture_root:

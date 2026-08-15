@@ -34,6 +34,9 @@ class FixtureMaterializer:
         task: BenchmarkTask,
         destination: Path | str,
     ) -> MaterializedRepository:
+        if task.external_repository is not None:
+            return self._materialize_external(task)
+
         source = (self._fixture_root / task.repository_fixture).resolve(strict=True)
         if source.parent != self._fixture_root:
             raise ValueError("benchmark fixture 路径越界")
@@ -59,6 +62,21 @@ class FixtureMaterializer:
             path=target,
             base_commit=commit,
             fixture_sha256=fixture_digest,
+        )
+
+    def _materialize_external(self, task: BenchmarkTask) -> MaterializedRepository:
+        """真实仓库模式: 复用已克隆的外部仓库, 校验固定 commit."""
+
+        if task.external_repository is None:
+            raise ValueError("外部仓库模式缺少仓库路径")
+        repository = Path(task.external_repository).resolve(strict=True)
+        commit = _git(repository, "rev-parse", "HEAD")
+        if commit != task.base_commit:
+            raise ValueError(f"外部仓库 HEAD 漂移: 期望 {task.base_commit}, 实际 {commit}")
+        return MaterializedRepository(
+            path=repository,
+            base_commit=commit,
+            fixture_sha256=task.fixture_sha256,
         )
 
 

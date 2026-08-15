@@ -1,0 +1,395 @@
+{
+  "suite_id": "evoweave_ds_v1",
+  "suite_sha256": "07f7614c52277ca8f0c0df47b44d3d33d7e48aec77f5223e7fd32b4f6095d8db",
+  "task_count": 8,
+  "records": [
+    {
+      "benchmark_id": "bench-01-short-merge-threshold",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-01-short-merge-threshold",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-01-short-merge-threshold",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 2,
+      "writable_agent_count": 2,
+      "dependency_count": 1,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium",
+        "medium"
+      ],
+      "rationale": "按 2 个用户写范围、固定 commit 文件规模和模块依赖，生成 2 个临时任务、1 条依赖；保留拆分：授权代码量 981 行达到拆分阈值 400 行。"
+    },
+    {
+      "benchmark_id": "bench-02-corrupt-transcript",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-02-corrupt-transcript",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-02-corrupt-transcript",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "按 1 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；单一写分组无需扩展任务图。"
+    },
+    {
+      "benchmark_id": "bench-03-chunk-defaults",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-03-chunk-defaults",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-03-chunk-defaults",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "按 1 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；单一写分组无需扩展任务图。"
+    },
+    {
+      "benchmark_id": "bench-04-clear-chat",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-04-clear-chat",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-04-clear-chat",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 4,
+      "writable_agent_count": 4,
+      "dependency_count": 2,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "按 4 个用户写范围、固定 commit 文件规模和模块依赖，生成 4 个临时任务、2 条依赖；保留拆分：授权代码量 990 行达到拆分阈值 400 行。"
+    },
+    {
+      "benchmark_id": "bench-05-transcribe-prompt",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-05-transcribe-prompt",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-05-transcribe-prompt",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "按 2 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；合并低收益分组：存在跨分组依赖，且授权代码量 348 行低于 400 行阈值。"
+    },
+    {
+      "benchmark_id": "bench-06-atomic-rebuild",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-06-atomic-rebuild",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-06-atomic-rebuild",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "medium",
+      "difficulty_match": true,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "按 2 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；合并低收益分组：存在跨分组依赖，且授权代码量 208 行低于 400 行阈值。"
+    },
+    {
+      "benchmark_id": "bench-07-transcribe-retry",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "low",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "low"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-07-transcribe-retry",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "low",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "low",
+        "low",
+        "low",
+        "low"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-07-transcribe-retry",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "medium",
+      "predicted_difficulty": "low",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "low"
+      ],
+      "rationale": "按 1 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；单一写分组无需扩展任务图。"
+    },
+    {
+      "benchmark_id": "bench-08-record-source-filter",
+      "agent_strategy": "single_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "单 Agent 对照：所有允许写范围合并为一个通用执行实例"
+    },
+    {
+      "benchmark_id": "bench-08-record-source-filter",
+      "agent_strategy": "fixed_multi_agent",
+      "agent_count": 4,
+      "writable_agent_count": 1,
+      "dependency_count": 3,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "rationale": "固定多 Agent 对照：始终创建四个串行通用实例"
+    },
+    {
+      "benchmark_id": "bench-08-record-source-filter",
+      "agent_strategy": "adaptive_agent",
+      "agent_count": 1,
+      "writable_agent_count": 1,
+      "dependency_count": 0,
+      "high_risk_task_count": 0,
+      "human_difficulty": "low",
+      "predicted_difficulty": "medium",
+      "difficulty_match": false,
+      "predicted_difficulties": [
+        "medium"
+      ],
+      "rationale": "按 2 个用户写范围、固定 commit 文件规模和模块依赖，生成 1 个临时任务、0 条依赖；合并低收益分组：存在跨分组依赖，且授权代码量 158 行低于 400 行阈值。"
+    }
+  ]
+}

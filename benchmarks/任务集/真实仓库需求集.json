@@ -1,0 +1,319 @@
+{
+  "suite_id": "evoweave_ds_v1",
+  "version": 1,
+  "hidden_acceptance_source": "benchmarks/任务集/隐藏验收/hidden_acceptance.py",
+  "hidden_acceptance_sha256": "6a6ffa96772bb42be1c073a1feba9895b50577dbd7ecab5000f31f623cb0730f",
+  "tasks": [
+    {
+      "benchmark_id": "bench-01-short-merge-threshold",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "将音频转写短句合并的阈值与强制入库超时参数化：合并阈值从环境变量 TA_MIN_CHARS 读取（默认 80，替换硬编码 500），强制入库超时从 TA_FLUSH_SECONDS 读取（默认 5.0）",
+      "acceptance_criteria": [
+        "TA_MIN_CHARS 可覆盖合并阈值且默认 80",
+        "TA_FLUSH_SECONDS 可覆盖强制入库超时且默认 5.0",
+        "audio_listener 不再使用硬编码合并常量"
+      ],
+      "allowed_paths": [
+        "app/audio_listener.py",
+        "app/config.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "app/audio_listener.py",
+        "app/config.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-02-corrupt-transcript",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "课堂记录文件损坏容错：TranscriptStore.iter_records 遇到无法解析的行时跳过并继续，而不是中断整个读取",
+      "acceptance_criteria": [
+        "损坏行被跳过",
+        "后续有效记录仍可读取"
+      ],
+      "allowed_paths": [
+        "rag/transcript_store.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "rag/transcript_store.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_module"
+      ]
+    },
+    {
+      "benchmark_id": "bench-03-chunk-defaults",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "统一文本切分默认参数：chunk_text 无参调用时的默认 max_chars/overlap 与 Settings 默认值一致（800/120），与需求文档规定的切分策略一致",
+      "acceptance_criteria": [
+        "chunk_text() 默认 max_chars=800",
+        "chunk_text() 默认 overlap=120"
+      ],
+      "allowed_paths": [
+        "rag/chunking.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "rag/chunking.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-04-clear-chat",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "Web UI 支持单独清空问答对话区而不影响课堂记录：新增清空对话端点（只清除学生提问历史与对话区），课堂记录与检索索引不受影响",
+      "acceptance_criteria": [
+        "清空对话接口只清理学生提问",
+        "课堂记录与检索索引不受影响",
+        "接口返回结构化结果"
+      ],
+      "allowed_paths": [
+        "app/web_server.py",
+        "rag/pipeline.py",
+        "rag/transcript_store.py",
+        "static/index.html"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "app/web_server.py",
+        "rag/pipeline.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_parallel"
+      ]
+    },
+    {
+      "benchmark_id": "bench-05-transcribe-prompt",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "豆包转写提示词可配置：Settings 新增转写提示词字段，from_env 读取 TA_DOUBAO_TRANSCRIBE_PROMPT（未设置时使用 DEFAULT_TRANSCRIBE_PROMPT），transcriber 豆包分支使用该提示词",
+      "acceptance_criteria": [
+        "Settings 提供豆包转写提示词字段",
+        "from_env 读取 TA_DOUBAO_TRANSCRIBE_PROMPT",
+        "transcriber 豆包分支使用配置的提示词"
+      ],
+      "allowed_paths": [
+        "app/config.py",
+        "app/transcriber.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "app/config.py",
+        "app/transcriber.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_serial"
+      ]
+    },
+    {
+      "benchmark_id": "bench-06-atomic-rebuild",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "索引重建原子化：LocalVectorIndex 提供原子保存（写临时文件后 os.replace），rebuild_index 重建失败时旧索引保持可用",
+      "acceptance_criteria": [
+        "索引保存使用临时文件加原子替换",
+        "重建过程中失败不破坏旧索引"
+      ],
+      "allowed_paths": [
+        "rag/vector_index.py",
+        "rag/pipeline.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "rag/vector_index.py",
+        "rag/pipeline.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_serial"
+      ]
+    },
+    {
+      "benchmark_id": "bench-07-transcribe-retry",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "转写失败自动重试一次：transcriber 的豆包/OpenAI 转写在网络或服务异常时重试一次，仍失败则回退并返回结构化结果",
+      "acceptance_criteria": [
+        "转写异常时自动重试一次",
+        "重试仍失败则回退并返回结构化结果"
+      ],
+      "allowed_paths": [
+        "app/transcriber.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "app/transcriber.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_module"
+      ]
+    },
+    {
+      "benchmark_id": "bench-08-record-source-filter",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "repository_fixture": "web_learning_tool",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/web_learning_tool",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "objective": "最近记录查询支持按来源过滤：TranscriptStore.recent 与 pipeline.recent_records 增加可选 source 参数，未提供时行为保持不变",
+      "acceptance_criteria": [
+        "recent 支持 source 过滤",
+        "未提供 source 时行为与原来一致"
+      ],
+      "allowed_paths": [
+        "rag/transcript_store.py",
+        "rag/pipeline.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "rag/transcript_store.py",
+        "rag/pipeline.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    }
+  ]
+}
