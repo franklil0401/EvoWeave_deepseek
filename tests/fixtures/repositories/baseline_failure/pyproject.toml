@@ -1,0 +1,9 @@
+[project]
+name = "baseline-failure-fixture"
+version = "0.0.0"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

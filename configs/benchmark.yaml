@@ -1,0 +1,12 @@
+{
+  "suite": "benchmarks/任务集/第二版任务集.json",
+  "results": "benchmarks/结果",
+  "agent_strategies": ["single_agent", "fixed_multi_agent", "adaptive_agent"],
+  "model_strategies": ["fixed_low", "fixed_high", "adaptive_model"],
+  "evidence_levels": ["offline_replay", "live_model"],
+  "required_records_per_evidence_level": 108,
+  "temperature": 0,
+  "max_dynamic_tasks": 8,
+  "split_directory_lines": 400,
+  "persist_api_key_values": false
+}

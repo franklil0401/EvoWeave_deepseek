@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_EDITABLE: "1"
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 安装 uv
+        run: python -m pip install uv==0.12.3
+      - name: 安装锁定依赖
+        run: uv sync --group dev --frozen
+      - name: Ruff 静态检查
+        run: uv run ruff check .
+      - name: Ruff 格式检查
+        run: uv run ruff format --check .
+      - name: mypy 类型检查
+        run: uv run mypy src
+      - name: 离线测试
+        run: uv run pytest
+      - name: Python 包导入
+        run: uv run python -c "import evoweave_ds; print(evoweave_ds.__version__)"

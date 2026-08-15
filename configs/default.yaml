@@ -1,0 +1,11 @@
+{
+  "runtime_directory": ".runtime",
+  "default_provider": "deepseek",
+  "default_model_id": "deepseek-v4-flash",
+  "sandbox_image": "evoweave_ds-python:3.12",
+  "max_worker_steps": 32,
+  "max_worker_tool_calls": 32,
+  "max_worker_seconds": 900,
+  "max_dynamic_tasks": 8,
+  "split_directory_lines": 400
+}

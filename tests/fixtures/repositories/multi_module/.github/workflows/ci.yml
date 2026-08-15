@@ -1,0 +1,7 @@
+name: fixture
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pytest

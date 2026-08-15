@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff 静态检查
+        entry: uv run --no-editable ruff check --fix
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: Ruff 格式检查
+        entry: uv run --no-editable ruff format --check
+        language: system
+        types_or: [python, pyi]
+      - id: mypy
+        name: mypy 类型检查
+        entry: uv run --no-editable mypy src
+        language: system
+        pass_filenames: false

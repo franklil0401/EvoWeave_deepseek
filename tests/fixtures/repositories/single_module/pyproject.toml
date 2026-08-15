@@ -1,0 +1,12 @@
+[project]
+name = "single-module-fixture"
+version = "0.0.0"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.11"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"

@@ -1,0 +1,2 @@
+# 统一 diff 证据中的单空格上下文标记属于格式，不是源码尾随空格。
+benchmarks/结果/**/最终补丁.diff -whitespace

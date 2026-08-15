@@ -1,0 +1,1 @@
+"""Structured telemetry adapters."""
