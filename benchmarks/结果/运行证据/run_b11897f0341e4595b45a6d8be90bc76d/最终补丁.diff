@@ -1,0 +1,101 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..ece1df8f6cf9320a731a70c9dcdfeea0088fbd19 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -29,7 +29,9 @@ class CourseRAGPipeline:
+     def save_student_question(self, question: str) -> TranscriptRecord | None:
+         return self.store.append(question, source="student")
+ 
+-    def _index_record(self, record: TranscriptRecord) -> None:
++    def _chunks_and_metas(
++        self, record: TranscriptRecord
++    ) -> tuple[list[str], list[dict[str, Any]]]:
+         chunks = chunk_text(
+             record.text,
+             max_chars=self.settings.chunk_max_chars,
+@@ -44,16 +46,25 @@ class CourseRAGPipeline:
+             }
+             for index, _ in enumerate(chunks)
+         ]
++        return chunks, metas
++
++    def _index_record(self, record: TranscriptRecord) -> None:
++        chunks, metas = self._chunks_and_metas(record)
+         self.index.add(chunks, metas)
+ 
++    def _index_record_into(self, index: LocalVectorIndex, record: TranscriptRecord) -> None:
++        chunks, metas = self._chunks_and_metas(record)
++        index.add(chunks, metas)
++
+     def rebuild_index(self) -> int:
+-        self.index.clear()
++        new_index = LocalVectorIndex(self.settings.index_path)
+         count = 0
+         for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
+-        self.index.save()
++            before = len(new_index.documents)
++            self._index_record_into(new_index, record)
++            count += len(new_index.documents) - before
++        new_index.save()
++        self.index = new_index
+         return count
+ 
+     def retrieve(self, question: str, top_k: int | None = None) -> list[dict[str, Any]]:
+@@ -76,4 +87,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..7c6ebe37823167676c97b7e3c84276c477fee32f 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,8 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
++import tempfile
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +92,24 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Atomically persist the index via a temp file followed by os.replace."""
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
+-            json.dump(payload, file, ensure_ascii=False, indent=2)
++        self.path.parent.mkdir(parents=True, exist_ok=True)
++        file_descriptor, temp_path = tempfile.mkstemp(
++            prefix=f".{self.path.name}.", suffix=".tmp", dir=self.path.parent
++        )
++        try:
++            with os.fdopen(file_descriptor, "w", encoding="utf-8") as file:
++                json.dump(payload, file, ensure_ascii=False, indent=2)
++                file.flush()
++                os.fsync(file.fileno())
++            os.replace(temp_path, self.path)
++        except BaseException:
++            try:
++                os.unlink(temp_path)
++            except OSError:
++                pass
++            raise
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -125,5 +142,4 @@ class LocalVectorIndex:
+     def clear(self) -> None:
+         self.documents = []
+         if self.path.exists():
+-            self.path.unlink()
+-
++            self.path.unlink()
+\ No newline at end of file

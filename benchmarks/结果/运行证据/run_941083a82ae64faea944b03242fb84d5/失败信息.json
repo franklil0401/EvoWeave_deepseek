@@ -1,0 +1,13 @@
+{
+  "details": {
+    "cached_input_tokens": 0,
+    "elapsed_ms": 150062,
+    "input_tokens": 788607,
+    "output_tokens": 21136,
+    "reasoning_tokens": 9460,
+    "steps": 19,
+    "tool_calls": 33
+  },
+  "error_code": "runtime_limit_exceeded",
+  "message": "Worker 已达到确定性运行上限"
+}

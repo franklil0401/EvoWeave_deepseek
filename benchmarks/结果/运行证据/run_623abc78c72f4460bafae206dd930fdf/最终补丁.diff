@@ -1,0 +1,96 @@
+diff --git a/app/web_server.py b/app/web_server.py
+index bb9c8731dfeed2618ec99b896e03ea2811747a5d..98289a4e530fa9d5679f322631b80f204e95966f 100644
+--- a/app/web_server.py
++++ b/app/web_server.py
+@@ -138,6 +138,13 @@ def create_app(settings: Settings | None = None) -> Flask:
+         bus.publish("status", {"message": "课堂历史已清空"})
+         return jsonify({"ok": True, "message": "本节课历史已清空"})
+ 
++    @app.post("/api/clear_qa")
++    def api_clear_qa():
++        """Clear only the student Q&A history; classroom records and the
++        retrieval index remain untouched."""
++        removed = pipeline.clear_student_questions()
++        return jsonify({"ok": True, "message": "对话区已清空", "cleared": removed})
++
+     @app.post("/api/ask")
+     def api_ask():
+         body = request.get_json(silent=True) or {}
+@@ -215,4 +222,4 @@ def create_app(settings: Settings | None = None) -> Flask:
+             "X-Accel-Buffering": "no",
+         })
+ 
+-    return app
++    return app
+\ No newline at end of file
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..64e1aa46a50f1b8cdde637e427085e20aa08f041 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -77,3 +77,12 @@ class CourseRAGPipeline:
+         self.store.clear()
+         self.index.clear()
+         self.index.save()
++
++    def clear_student_questions(self) -> int:
++        """Clear only student-question history from the transcript store.
++
++        Classroom (teacher) records and the retrieval index are left
++        untouched, since student questions are never part of the index.
++        Returns the number of student-question records removed.
++        """
++        return self.store.delete_student_questions()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..b956a1d4405b96ea8aa6707b2dcaaf1f437b7e14 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -77,3 +77,18 @@ class TranscriptStore:
+             self.path.unlink()
+         self.path.touch()
+ 
++    def delete_student_questions(self) -> int:
++        """Remove only student-question records, keeping classroom (teacher) records.
++
++        Returns the number of student-question records removed. The retrieval
++        index is unaffected because student questions are not part of it.
++        """
++        if not self.path.is_file():
++            return 0
++        records = list(self.iter_records())
++        kept = [record for record in records if record.source != "student"]
++        removed = len(records) - len(kept)
++        with self.path.open("w", encoding="utf-8") as file:
++            for record in kept:
++                file.write(json.dumps(record.to_dict(), ensure_ascii=False) + "\n")
++        return removed
+\ No newline at end of file
+diff --git a/static/index.html b/static/index.html
+index 5baeba3c0fbdddc70fdff3b15bdfdbde3257e21d..1f5c6d79652cae48af55fc3eb4b98527f08438bd 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -489,8 +489,15 @@ async function doClear() {
+ }
+ 
+ // ── clear QA ──
+-function doClearQA() {
+-  document.getElementById('qaBody').innerHTML = '';
++async function doClearQA() {
++  if (!confirm('确定清空对话区吗？课堂记录不受影响。')) return;
++  const res = await api('/api/clear_qa');
++  if (res.ok) {
++    document.getElementById('qaBody').innerHTML = '';
++    addStatusMsg(res.message);
++  } else {
++    alert(res.message);
++  }
+ }
+ 
+ // ── source ──
+@@ -611,4 +618,4 @@ async function init() {
+ init();
+ </script>
+ </body>
+-</html>
++</html>
+\ No newline at end of file

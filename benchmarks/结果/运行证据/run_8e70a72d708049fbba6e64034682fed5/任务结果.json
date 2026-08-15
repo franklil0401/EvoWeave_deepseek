@@ -1,0 +1,121 @@
+[
+  {
+    "agent_id": "agent_bbb9656051284841b74c5a5c887a4c28",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_e59863f57b3d48a2a9f56c7be24f75e3",
+        "created_at": "2026-08-15T14:44:10.151754Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "42a0f50fbd607e47ef08ceb2259c9c79ddf2fe612c5843060f193f04bc032092",
+        "size_bytes": 2649,
+        "storage_key": "sha256/42/42a0f50fbd607e47ef08ceb2259c9c79ddf2fe612c5843060f193f04bc032092"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_03703047a6424d2f96cfbdc32857e905",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6809e47a35384d818a86d2e5de7757f9",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_e59863f57b3d48a2a9f56c7be24f75e3",
+        "command": null,
+        "evidence_id": "evidence_12d1495765414400b3bb2815edb354a7",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0d3b62bbfa614e5685eea37332c223d9",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_09ca51157583451782202e854319d04e",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0736ab7193db444b870c2c72c6fbd72a",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_7807325bdb994e2c81c07e9e101a978b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_2414b9179577445fadf232e4289347b2",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已在 app/transcriber.py 中实现转写失败自动重试逻辑：\n\n1. 新增 `_is_transient_error(exc)` 静态方法，用于区分网络/服务类瞬时异常（如超时、连接失败、5xx 服务端错误）与确定性错误（如配置缺失、依赖缺失的 RuntimeError），前者才值得重试。\n2. 新增 `_transcribe_with_retry(wav_path, provider, transcribe_fn)` 方法：对转写调用进行最多 2 次尝试（首次 + 重试一次）；瞬时异常时自动重试一次；重试仍失败则回退，返回结构化 `TranscriptionResult(text=\"\", provider=..., warning=\"转写失败（已自动重试 1 次）：...\")`，保证调用方始终能拿到结构化结果。\n3. `transcribe_wav` 中 openai 与 doubao 两个云端转写路径均改为通过 `_transcribe_with_retry` 调用，覆盖豆包/OpenAI 两类转写。\n\n验收条件均已满足：转写异常时自动重试一次；重试仍失败则回退并返回结构化结果。写入已确认生成补丁产物，文件内容已更新。",
+    "task_id": "task_3839662645d742a69a2502e306331999",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 68812,
+      "input_tokens": 311701,
+      "output_tokens": 9721,
+      "reasoning_tokens": 4056,
+      "steps": 12,
+      "tool_calls": 11
+    }
+  }
+]

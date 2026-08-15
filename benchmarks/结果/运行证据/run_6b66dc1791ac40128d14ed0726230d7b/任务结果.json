@@ -1,0 +1,154 @@
+[
+  {
+    "agent_id": "agent_ad0382d7fc5843c4917bd8b919cad3cf",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_5b651b5373bf480c86a04ed6e4ff9ed5",
+        "created_at": "2026-08-15T13:40:03.501311Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "1b6dd0a92cbebb826a5d1f484d729a7d74fc809c5995bdd8dd38b5d998c42473",
+        "size_bytes": 1949,
+        "storage_key": "sha256/1b/1b6dd0a92cbebb826a5d1f484d729a7d74fc809c5995bdd8dd38b5d998c42473"
+      },
+      {
+        "artifact_id": "artifact_b1ba14a5ec1e4dc8884c73cde7108687",
+        "created_at": "2026-08-15T13:40:28.410784Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "0245e552665501248d7babad7cc98b1dc803a057eca6ac38c480a0b6e7afb420",
+        "size_bytes": 661,
+        "storage_key": "sha256/02/0245e552665501248d7babad7cc98b1dc803a057eca6ac38c480a0b6e7afb420"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_c1510cb5c02046869ef042b7ea0e8183",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_5b651b5373bf480c86a04ed6e4ff9ed5",
+        "command": null,
+        "evidence_id": "evidence_92f0c753dcec49c7bc56bd524d95fd3d",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_7085effa195a40fd94f5f10b68b3236e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6684a5820fd444238d5ca7105a0d447c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0ae4ac05bdf74d289e957006fcd13627",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_b1ba14a5ec1e4dc8884c73cde7108687",
+        "command": null,
+        "evidence_id": "evidence_18546ba30b8642a1b07d3f680cc6565a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_fce2d3bdd27c4dd78ee1e050501903ba",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0beccb29d2e34c0992653334a0aad97e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_01afb03b72b943f4bd4c8f8a186be258",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_62668904fe4f414fa03d22e4f1ce00a5",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_3d078a3cb5a645b6ace35ef70d47de8a",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已在 app/transcriber.py 中实现转写失败自动重试逻辑。transcribe_wav 现在对 openai 和 doubao 云端转写都调用新增的 _transcribe_with_retry 方法：首次转写失败时自动重试一次；若重试仍失败，则回退返回结构化 TranscriptionResult（text 为空、provider 保留、warning 携带异常信息），不再向上抛异常。验收两条均满足：转写异常时自动重试一次；重试仍失败则回退并返回结构化结果。",
+    "task_id": "task_56c1cdf21ee34fdfbaeb22bba7cf33e5",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 63405,
+      "input_tokens": 355818,
+      "output_tokens": 8095,
+      "reasoning_tokens": 3652,
+      "steps": 13,
+      "tool_calls": 12
+    }
+  }
+]

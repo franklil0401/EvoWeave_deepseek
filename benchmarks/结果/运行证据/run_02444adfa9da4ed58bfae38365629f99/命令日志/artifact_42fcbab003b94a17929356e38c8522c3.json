@@ -1,0 +1,1 @@
+{"argv":["python","-m","pytest","-q","tests/test_pipeline.py"],"attempt":1,"command_id":"spec_712b8a4aaaad4551b169782f612efff0","duration_ms":530,"exit_code":0,"name":"局部测试","output_truncated":false,"phase":"candidate","scope":"local","stderr":"","stdout":"............                                                             [100%]\r\n12 passed in 0.19s\r\n","timed_out":false}

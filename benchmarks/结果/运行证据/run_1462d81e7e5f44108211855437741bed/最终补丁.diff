@@ -1,0 +1,43 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..edd1516b77e0483ae5a200f46db0708799fee648 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -60,12 +60,26 @@ class AudioTranscriber:
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
+-        if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
+-        if provider == "doubao_streaming":
++            transcribe = lambda: self._transcribe_openai(Path(wav_path))
++        elif provider == "doubao":
++            transcribe = lambda: self._transcribe_doubao(Path(wav_path))
++        elif provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+-        raise RuntimeError(f"不支持的云端转写提供方：{provider}")
++        else:
++            raise RuntimeError(f"不支持的云端转写提供方：{provider}")
++
++        # 网络或服务异常时自动重试一次，仍失败则回退并返回结构化结果。
++        try:
++            return transcribe()
++        except Exception as exc:
++            try:
++                return transcribe()
++            except Exception as retry_exc:
++                return TranscriptionResult(
++                    text="",
++                    provider=provider,
++                    warning=f"{provider} 转写失败（已重试一次）：{retry_exc}；原始错误：{exc}",
++                )
+ 
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+@@ -130,4 +144,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

@@ -1,0 +1,122 @@
+diff --git a/app/web_server.py b/app/web_server.py
+index bb9c8731dfeed2618ec99b896e03ea2811747a5d..5d7c4df483497c621141682624d3cc0697f4d538 100644
+--- a/app/web_server.py
++++ b/app/web_server.py
+@@ -138,6 +138,23 @@ def create_app(settings: Settings | None = None) -> Flask:
+         bus.publish("status", {"message": "课堂历史已清空"})
+         return jsonify({"ok": True, "message": "本节课历史已清空"})
+ 
++    @app.post("/api/clear-chat")
++    def api_clear_chat():
++        """Clear only the student Q&A chat area.
++
++        Only student question records are removed; classroom (teacher)
++        records and the retrieval index are left untouched.
++        """
++        removed = pipeline.clear_chat()
++        kept = pipeline.store.count()
++        bus.publish("status", {"message": "对话区已清空，课堂记录未受影响"})
++        return jsonify({
++            "ok": True,
++            "message": "对话区已清空，课堂记录未受影响",
++            "removed": removed,
++            "kept_records": kept,
++        })
++
+     @app.post("/api/ask")
+     def api_ask():
+         body = request.get_json(silent=True) or {}
+@@ -215,4 +232,4 @@ def create_app(settings: Settings | None = None) -> Flask:
+             "X-Accel-Buffering": "no",
+         })
+ 
+-    return app
++    return app
+\ No newline at end of file
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..a5b574613a4c451e0124bfe4f068ce86aaed4d26 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -73,7 +73,16 @@ class CourseRAGPipeline:
+     def recent_records(self, limit: int = 5) -> list[TranscriptRecord]:
+         return self.store.recent(limit)
+ 
++    def clear_chat(self) -> int:
++        """Clear only student question records (the Q&A chat area).
++
++        Classroom (teacher) records and the retrieval index are left
++        untouched, so subsequent RAG retrieval keeps working on the full
++        lesson content. Returns the number of student records removed.
++        """
++        return self.store.delete_by_source("student")
++
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..b42f60f926deb7cc159ca02dee95a41e847a4988 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -72,8 +72,27 @@ class TranscriptStore:
+     def count(self) -> int:
+         return sum(1 for _ in self.iter_records())
+ 
++    def delete_by_source(self, source: str) -> int:
++        """Delete all records with the given source, keeping the rest.
++
++        Returns the number of records removed. Records with any other source
++        (e.g. classroom/teacher records) are preserved verbatim.
++        """
++        if not self.path.is_file():
++            return 0
++        rows = list(self.iter_records())
++        kept = [row for row in rows if row.source != source]
++        removed = len(rows) - len(kept)
++        if removed == 0:
++            return 0
++        tmp = self.path.with_name(self.path.name + ".tmp")
++        with tmp.open("w", encoding="utf-8") as file:
++            for row in kept:
++                file.write(json.dumps(row.to_dict(), ensure_ascii=False) + "\n")
++        tmp.replace(self.path)
++        return removed
++
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file
+diff --git a/static/index.html b/static/index.html
+index 5baeba3c0fbdddc70fdff3b15bdfdbde3257e21d..0e2f55e93eb92849fc2f762f8379748c56534110 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -489,8 +489,15 @@ async function doClear() {
+ }
+ 
+ // ── clear QA ──
+-function doClearQA() {
+-  document.getElementById('qaBody').innerHTML = '';
++async function doClearQA() {
++  if (!confirm('确定清空问答对话区吗？课堂记录与检索索引不受影响。')) return;
++  const res = await api('/api/clear-chat');
++  if (res.ok) {
++    document.getElementById('qaBody').innerHTML = '';
++    if (res.message) addStatusMsg(res.message);
++  } else {
++    if (res.message) alert(res.message);
++  }
+ }
+ 
+ // ── source ──
+@@ -611,4 +618,4 @@ async function init() {
+ init();
+ </script>
+ </body>
+-</html>
++</html>
+\ No newline at end of file

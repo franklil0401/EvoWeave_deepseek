@@ -1,0 +1,47 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..f85d50919f25f470aa6e5688ce57d5648a7338bf 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -60,13 +60,33 @@ class AudioTranscriber:
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
++            return self._transcribe_cloud_with_retry(
++                provider, lambda: self._transcribe_openai(Path(wav_path))
++            )
+         if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++            return self._transcribe_cloud_with_retry(
++                provider, lambda: self._transcribe_doubao(Path(wav_path))
++            )
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_cloud_with_retry(
++        self, provider: str, attempt
++    ) -> TranscriptionResult:
++        """云端转写：网络或服务异常时自动重试一次，仍失败则回退并返回结构化结果。"""
++        last_error: Exception | None = None
++        for _ in range(2):
++            try:
++                return attempt()
++            except Exception as exc:  # noqa: BLE001 - 转写失败需回退，不向上抛
++                last_error = exc
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"转写失败，已自动重试一次仍失败，已回退：{last_error}",
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -130,4 +150,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

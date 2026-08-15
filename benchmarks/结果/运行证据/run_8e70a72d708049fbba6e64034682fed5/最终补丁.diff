@@ -1,0 +1,69 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..6c00a4f10c8eb08b1c298f9203c918e414f6c6da 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -57,12 +57,55 @@ class AudioTranscriber:
+             and bool(self.settings.doubao_asr_resource_id)
+         )
+ 
++    @staticmethod
++    def _is_transient_error(exc: BaseException) -> bool:
++        """判断异常是否为网络/服务类瞬时错误。
++
++        配置缺失、依赖缺失等 RuntimeError 属于确定性错误，重试无意义；
++        网络超时、连接失败、服务端返回 5xx 等瞬时错误才需要重试。
++        """
++        if isinstance(exc, RuntimeError):
++            return False
++        return True
++
++    def _transcribe_with_retry(
++        self,
++        wav_path: Path,
++        provider: str,
++        transcribe_fn,
++    ) -> TranscriptionResult:
++        """调用转写方法，网络/服务异常时自动重试一次。
++
++        重试仍失败时回退并返回结构化结果（空文本 + 警告信息），
++        保证调用方始终能拿到结构化的 TranscriptionResult。
++        """
++        attempts = 0
++        last_error: BaseException | None = None
++        while attempts < 2:
++            attempts += 1
++            try:
++                return transcribe_fn(wav_path)
++            except Exception as exc:  # noqa: BLE001 - 转写第三方调用异常种类繁多
++                last_error = exc
++                if not self._is_transient_error(exc) or attempts >= 2:
++                    break
++        # 重试仍失败：回退并返回结构化结果
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"转写失败（已自动重试 {attempts - 1} 次）：{last_error}",
++        )
++
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
++            return self._transcribe_with_retry(
++                Path(wav_path), provider, self._transcribe_openai
++            )
+         if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++            return self._transcribe_with_retry(
++                Path(wav_path), provider, self._transcribe_doubao
++            )
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+@@ -130,4 +173,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

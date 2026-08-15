@@ -5,11 +5,6 @@
       "branch": "evoweave-exp/smoke",
       "head_sha": "358a96e53421b577bb8802176c8da28fdac6f806",
       "base_sha": "358a96e53421b577bb8802176c8da28fdac6f806"
-    },
-    {
-      "branch": "evoweave_ds/run_79a2e71979b549bea024e5e866f300f8/task_1225d7aae782450b9d205b14ca58bc62/1b79ef68b8ff47ad",
-      "head_sha": "c40a5a78bc3e0b549932129713ac65806815c579",
-      "base_sha": "c40a5a78bc3e0b549932129713ac65806815c579"
     }
   ]
 }

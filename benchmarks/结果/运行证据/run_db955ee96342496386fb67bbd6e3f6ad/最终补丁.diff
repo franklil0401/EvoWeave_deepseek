@@ -1,0 +1,77 @@
+diff --git a/app/audio_listener.py b/app/audio_listener.py
+index bb3e164d74c9398194ca53dcfe4892b9006b9290..b0a33211143931635c7de0d2787e0926430f5bf7 100644
+--- a/app/audio_listener.py
++++ b/app/audio_listener.py
+@@ -20,11 +20,6 @@ from app.transcriber import AudioTranscriber
+ 
+ 
+ class AudioListener:
+-    # ── 短句合并参数 ──
+-    _MERGE_MIN_CHARS = 80       # 积累到 80 字以上才作为一条入库
+-    _MERGE_MAX_CHARS = 500      # 超过 500 字强制入库（避免太长）
+-    _MERGE_FLUSH_SECONDS = 5.0 # 超过 5 秒没新句子也强制入库
+-
+     def __init__(
+         self,
+         on_final_text: Callable[[str], None],
+@@ -47,6 +42,8 @@ class AudioListener:
+         self._merge_last_time = 0.0
+         self._merge_lock = threading.Lock()
+         self._merge_timer: threading.Timer | None = None
++        self._merge_min_chars = self.settings.audio_merge_min_chars
++        self._merge_flush_seconds = self.settings.audio_flush_seconds
+ 
+     @property
+     def is_running(self) -> bool:
+@@ -124,13 +121,13 @@ class AudioListener:
+             if self._merge_timer is not None:
+                 self._merge_timer.cancel()
+             self._merge_timer = threading.Timer(
+-                self._MERGE_FLUSH_SECONDS, self._flush_merge_buffer, kwargs={"reason": "超时"}
++                self._merge_flush_seconds, self._flush_merge_buffer, kwargs={"reason": "超时"}
+             )
+             self._merge_timer.daemon = True
+             self._merge_timer.start()
+ 
+             # 积累够了就立刻入库
+-            if self._merge_chars >= self._MERGE_MAX_CHARS:
++            if self._merge_chars >= self._merge_min_chars:
+                 self._do_flush(reason="长度足够")
+ 
+     def _flush_merge_buffer(self, reason: str = "") -> None:
+@@ -763,4 +760,4 @@ class AudioListener:
+ 
+         if len(audio) == 0:
+             return 0.0
+-        return float(np.sqrt(np.mean(np.square(audio))))
++        return float(np.sqrt(np.mean(np.square(audio))))
+\ No newline at end of file
+diff --git a/app/config.py b/app/config.py
+index 82cc499d4f22990d4b4c6ea08dd980318f18f6ed..71a4688c3b9366bef2ded7722e75e90ad9d76bb2 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -94,6 +94,8 @@ class Settings:
+     audio_min_segment_seconds: float = 1.2
+     audio_transcribe_queue_size: int = 3
+     audio_min_rms: float = 0.006
++    audio_merge_min_chars: int = 80
++    audio_flush_seconds: float = 5.0
+     keep_audio_chunks: bool = False
+ 
+     @classmethod
+@@ -200,6 +202,8 @@ class Settings:
+                 os.environ.get("TA_AUDIO_TRANSCRIBE_QUEUE_SIZE", "3")
+             ),
+             audio_min_rms=float(os.environ.get("TA_AUDIO_MIN_RMS", "0.006")),
++            audio_merge_min_chars=int(os.environ.get("TA_MIN_CHARS", "80")),
++            audio_flush_seconds=float(os.environ.get("TA_FLUSH_SECONDS", "5.0")),
+             keep_audio_chunks=_bool_from_env("TA_KEEP_AUDIO_CHUNKS", False),
+         )
+ 
+@@ -212,4 +216,4 @@ class Settings:
+             data_dir=data_path,
+             transcript_path=data_path / "transcripts.jsonl",
+             index_path=data_path / "vector_index.json",
+-        )
++        )
+\ No newline at end of file

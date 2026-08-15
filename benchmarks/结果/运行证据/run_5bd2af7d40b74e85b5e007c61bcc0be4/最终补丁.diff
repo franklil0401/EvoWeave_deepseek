@@ -1,0 +1,147 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..4bdfc8ac046bcc5d5253a59ae21a8c676efc39fd 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -4,6 +4,7 @@
+ from __future__ import annotations
+ 
+ import base64
++from collections.abc import Callable
+ from dataclasses import dataclass
+ from pathlib import Path
+ 
+@@ -67,6 +68,28 @@ class AudioTranscriber:
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_with_retry(
++        self,
++        call: Callable[[], TranscriptionResult],
++        provider: str,
++    ) -> TranscriptionResult:
++        """执行云端转写调用；网络或服务异常时自动重试一次。
++
++        两次尝试均失败时回退：返回空文本的结构化结果并在 warning 中说明失败原因，
++        不再向上抛出异常，避免打断录音转写流程。
++        """
++        last_error: Exception | None = None
++        for _ in range(2):
++            try:
++                return call()
++            except Exception as exc:
++                last_error = exc
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"{provider} 云端转写失败（已自动重试一次）：{last_error}",
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -76,21 +99,24 @@ class AudioTranscriber:
+         except Exception as exc:
+             raise RuntimeError("缺少 openai 依赖，请先执行：pip install openai") from exc
+ 
+-        kwargs = {"api_key": self.settings.openai_api_key}
+-        if self.settings.openai_base_url:
+-            kwargs["base_url"] = self.settings.openai_base_url
+-        client = OpenAI(**kwargs)
+-
+-        with wav_path.open("rb") as audio_file:
+-            response = client.audio.transcriptions.create(
+-                model=self.settings.openai_transcribe_model,
+-                file=audio_file,
+-                response_format="text",
+-                prompt=self.settings.openai_transcribe_prompt or None,
+-            )
++        def _call() -> TranscriptionResult:
++            kwargs = {"api_key": self.settings.openai_api_key}
++            if self.settings.openai_base_url:
++                kwargs["base_url"] = self.settings.openai_base_url
++            client = OpenAI(**kwargs)
+ 
+-        text = response if isinstance(response, str) else getattr(response, "text", "")
+-        return TranscriptionResult(text=(text or "").strip(), provider="openai")
++            with wav_path.open("rb") as audio_file:
++                response = client.audio.transcriptions.create(
++                    model=self.settings.openai_transcribe_model,
++                    file=audio_file,
++                    response_format="text",
++                    prompt=self.settings.openai_transcribe_prompt or None,
++                )
++
++            text = response if isinstance(response, str) else getattr(response, "text", "")
++            return TranscriptionResult(text=(text or "").strip(), provider="openai")
++
++        return self._transcribe_with_retry(_call, "openai")
+ 
+     def _transcribe_doubao(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.ark_api_key:
+@@ -101,33 +127,36 @@ class AudioTranscriber:
+         except Exception as exc:
+             raise RuntimeError("缺少 openai 依赖，请先执行：pip install openai") from exc
+ 
+-        client = OpenAI(
+-            api_key=self.settings.ark_api_key,
+-            base_url=self.settings.ark_base_url,
+-        )
+-        encoded_audio = base64.b64encode(wav_path.read_bytes()).decode("utf-8")
+-        response = client.chat.completions.create(
+-            model=self.settings.doubao_transcribe_model,
+-            messages=[
+-                {
+-                    "role": "user",
+-                    "content": [
+-                        {
+-                            "type": "input_audio",
+-                            "input_audio": {
+-                                "data": encoded_audio,
+-                                "format": "wav",
++        def _call() -> TranscriptionResult:
++            client = OpenAI(
++                api_key=self.settings.ark_api_key,
++                base_url=self.settings.ark_base_url,
++            )
++            encoded_audio = base64.b64encode(wav_path.read_bytes()).decode("utf-8")
++            response = client.chat.completions.create(
++                model=self.settings.doubao_transcribe_model,
++                messages=[
++                    {
++                        "role": "user",
++                        "content": [
++                            {
++                                "type": "input_audio",
++                                "input_audio": {
++                                    "data": encoded_audio,
++                                    "format": "wav",
++                                },
+                             },
+-                        },
+-                        {
+-                            "type": "text",
+-                            "text": "请把这段课堂音频准确转写成中文文字，只输出转写结果。",
+-                        },
+-                    ],
+-                }
+-            ],
+-        )
+-        return TranscriptionResult(
+-            text=response.choices[0].message.content.strip(),
+-            provider="doubao",
+-        )
++                            {
++                                "type": "text",
++                                "text": "请把这段课堂音频准确转写成中文文字，只输出转写结果。",
++                            },
++                        ],
++                    }
++                ],
++            )
++            return TranscriptionResult(
++                text=response.choices[0].message.content.strip(),
++                provider="doubao",
++            )
++
++        return self._transcribe_with_retry(_call, "doubao")
+\ No newline at end of file

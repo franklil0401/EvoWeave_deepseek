@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "validation_failed",
+  "message": "chunk_text() 默认参数未达标：默认 max_chars=420（要求 800）、默认 overlap=60（要求 120）。"
+}

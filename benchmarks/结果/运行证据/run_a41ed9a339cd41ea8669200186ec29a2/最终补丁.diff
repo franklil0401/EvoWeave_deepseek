@@ -1,0 +1,118 @@
+diff --git a/app/web_server.py b/app/web_server.py
+index bb9c8731dfeed2618ec99b896e03ea2811747a5d..c396bde575b8be8132d6ed0ecc4b172c5455a99d 100644
+--- a/app/web_server.py
++++ b/app/web_server.py
+@@ -138,6 +138,22 @@ def create_app(settings: Settings | None = None) -> Flask:
+         bus.publish("status", {"message": "课堂历史已清空"})
+         return jsonify({"ok": True, "message": "本节课历史已清空"})
+ 
++    @app.post("/api/clear-qa")
++    def api_clear_qa():
++        """Clear only the student Q&A conversation.
++
++        Student question history is removed from the transcript store while
++        teacher classroom records and the retrieval index are left untouched.
++        """
++        removed = pipeline.clear_conversation()
++        remaining = sum(1 for _ in pipeline.store.iter_records(source="teacher"))
++        return jsonify({
++            "ok": True,
++            "removed": removed,
++            "teacher_records": remaining,
++            "message": "问答对话已清空，课堂记录与检索索引不受影响",
++        })
++
+     @app.post("/api/ask")
+     def api_ask():
+         body = request.get_json(silent=True) or {}
+@@ -215,4 +231,4 @@ def create_app(settings: Settings | None = None) -> Flask:
+             "X-Accel-Buffering": "no",
+         })
+ 
+-    return app
++    return app
+\ No newline at end of file
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..53dbfaeb7fdd871b67abdea66297fd7d8ad4e92f 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -73,7 +73,16 @@ class CourseRAGPipeline:
+     def recent_records(self, limit: int = 5) -> list[TranscriptRecord]:
+         return self.store.recent(limit)
+ 
++    def clear_conversation(self) -> int:
++        """Clear only student question history.
++
++        Teacher classroom records and the retrieval index are left untouched.
++
++        Returns the number of student-question records removed.
++        """
++        return self.store.clear_student_questions()
++
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..50238e4efa4513051c1fd2b36b6155aeb495f426 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -72,8 +72,25 @@ class TranscriptStore:
+     def count(self) -> int:
+         return sum(1 for _ in self.iter_records())
+ 
++    def clear_student_questions(self) -> int:
++        """Remove only student-question records while keeping teacher records.
++
++        Returns the number of student-question records removed.
++        """
++        removed = 0
++        kept: list[TranscriptRecord] = []
++        for record in self.iter_records():
++            if record.source == "student":
++                removed += 1
++            else:
++                kept.append(record)
++        if removed:
++            with self.path.open("w", encoding="utf-8") as file:
++                for record in kept:
++                    file.write(json.dumps(record.to_dict(), ensure_ascii=False) + "\n")
++        return removed
++
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file
+diff --git a/static/index.html b/static/index.html
+index 5baeba3c0fbdddc70fdff3b15bdfdbde3257e21d..67206b02aba353f417451cd63533fa4e06480204 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -489,8 +489,15 @@ async function doClear() {
+ }
+ 
+ // ── clear QA ──
+-function doClearQA() {
++async function doClearQA() {
++  if (!confirm('确定清空当前问答对话吗？课堂记录不会受影响。')) return;
++  const res = await api('/api/clear-qa');
+   document.getElementById('qaBody').innerHTML = '';
++  if (res.ok) {
++    addStatusMsg(res.message);
++  } else {
++    alert(res.message || '清空对话失败');
++  }
+ }
+ 
+ // ── source ──
+@@ -611,4 +618,4 @@ async function init() {
+ init();
+ </script>
+ </body>
+-</html>
++</html>
+\ No newline at end of file

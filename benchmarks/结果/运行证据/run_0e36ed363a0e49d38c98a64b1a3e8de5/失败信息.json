@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "validation_failed",
+  "message": "验收条件未满足：rag/chunking.py 中 chunk_text() 的默认参数为 max_chars=420、overlap=60，而非要求的 800/120。"
+}

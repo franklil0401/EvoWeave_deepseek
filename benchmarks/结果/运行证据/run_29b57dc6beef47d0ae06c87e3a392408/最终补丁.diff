@@ -1,0 +1,106 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..7616c0ea0687b8aecb599099de457bbad709a307 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -46,15 +46,47 @@ class CourseRAGPipeline:
+         ]
+         self.index.add(chunks, metas)
+ 
++    def _build_documents(self, records: list[TranscriptRecord]) -> list[dict[str, Any]]:
++        """Build the index document list without touching the live index."""
++        documents: list[dict[str, Any]] = []
++        for record in records:
++            chunks = chunk_text(
++                record.text,
++                max_chars=self.settings.chunk_max_chars,
++                overlap=self.settings.chunk_overlap,
++            )
++            for index, chunk in enumerate(chunks):
++                clean = (chunk or "").strip()
++                if not clean:
++                    continue
++                documents.append(
++                    {
++                        "text": clean,
++                        "meta": {
++                            "record_id": record.id,
++                            "source": record.source,
++                            "chunk_index": index,
++                            "created_at": record.created_at,
++                        },
++                    }
++                )
++        return documents
++
+     def rebuild_index(self) -> int:
+-        self.index.clear()
+-        count = 0
+-        for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
++        """Rebuild the index atomically, preserving the old index on failure.
++
++        All documents are rebuilt into a separate list first. The live in-memory
++        index and the on-disk file are only touched after the entire rebuild has
++        succeeded, and the file itself is persisted atomically (temp file +
++        os.replace). If any step fails before that point, the previously loaded
++        index remains fully usable.
++        """
++        records = list(self.store.iter_records(source="teacher"))
++        new_documents = self._build_documents(records)
++        # Only after a successful rebuild do we swap the live state and persist.
++        self.index.documents = new_documents
+         self.index.save()
+-        return count
++        return len(new_documents)
+ 
+     def retrieve(self, question: str, top_k: int | None = None) -> list[dict[str, Any]]:
+         results = self.index.search(question, top_k or self.settings.retrieve_top_k)
+@@ -76,4 +108,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..82901f594df80b7aa61edb559457491dc0814eaa 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +91,18 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Persist the index atomically via a temp file + os.replace.
++
++        The payload is first written to a temporary sibling file; only after a
++        complete, successful write is the temp file moved over the destination.
++        This guarantees the previously stored index remains intact if writing or
++        replacing fails mid-way.
++        """
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
++        temp_path = self.path.with_suffix(self.path.suffix + ".tmp")
++        with temp_path.open("w", encoding="utf-8") as file:
+             json.dump(payload, file, ensure_ascii=False, indent=2)
++        os.replace(temp_path, self.path)
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -125,5 +135,4 @@ class LocalVectorIndex:
+     def clear(self) -> None:
+         self.documents = []
+         if self.path.exists():
+-            self.path.unlink()
+-
++            self.path.unlink()
+\ No newline at end of file

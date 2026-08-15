@@ -1,0 +1,21 @@
+diff --git a/rag/chunking.py b/rag/chunking.py
+index 23e80213c62cddd4fef0edba87be29577f2987ad..a07b814d8ea70c607f08e8b3276efbd9722c1ef6 100644
+--- a/rag/chunking.py
++++ b/rag/chunking.py
+@@ -36,7 +36,7 @@ def _fixed_chunks(text: str, max_chars: int, overlap: int) -> list[str]:
+     return chunks
+ 
+ 
+-def chunk_text(text: str, max_chars: int = 420, overlap: int = 60) -> list[str]:
++def chunk_text(text: str, max_chars: int = 800, overlap: int = 120) -> list[str]:
+     text = normalize_text(text)
+     if not text:
+         return []
+@@ -65,5 +65,4 @@ def chunk_text(text: str, max_chars: int = 420, overlap: int = 60) -> list[str]:
+ 
+     if current:
+         chunks.append(current)
+-    return chunks
+-
++    return chunks
+\ No newline at end of file

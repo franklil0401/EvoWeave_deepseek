@@ -1,0 +1,110 @@
+[
+  {
+    "agent_id": "agent_fbba7a7596da441ea9a180e2b1f60886",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "created_at": "2026-08-15T13:16:17.173491Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18",
+        "size_bytes": 1544,
+        "storage_key": "sha256/16/1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18"
+      },
+      {
+        "artifact_id": "artifact_7ee06cf845684136a1d168b19d17951a",
+        "created_at": "2026-08-15T14:41:39.384623Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "fe3358036d3e75defce32bf5f36870630566e745f15b7f498ff0d92ffa70c267",
+        "size_bytes": 618,
+        "storage_key": "sha256/fe/fe3358036d3e75defce32bf5f36870630566e745f15b7f498ff0d92ffa70c267"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_d5ffcfb327ba436ca100ace08f0f3eda",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_d5ed2935b89b456f838f5979d0a04d23",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "command": null,
+        "evidence_id": "evidence_72a6ef3c634947078df931085ba5dc55",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_7ee06cf845684136a1d168b19d17951a",
+        "command": null,
+        "evidence_id": "evidence_484270d06fa54b798abf9449703657a4",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_639d902f094e405a9d59815523edbf1c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_88b82a6acfd042b1915c8ec37cb35b81",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_6bb80d80352a4dff915978ec187ca406",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已完成豆包转写提示词可配置化：Settings 新增 doubao_transcribe_prompt 字段（默认 DEFAULT_TRANSCRIBE_PROMPT）；from_env 读取 TA_DOUBAO_TRANSCRIBE_PROMPT（未设置时回退默认值）；transcriber._transcribe_doubao 豆包分支使用 settings.doubao_transcribe_prompt。仅修改了授权范围内的 app/config.py 与 app/transcriber.py。",
+    "task_id": "task_38ee11d8c941437ea5fc3487bf8dc4d6",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 39327,
+      "input_tokens": 133071,
+      "output_tokens": 7173,
+      "reasoning_tokens": 2474,
+      "steps": 5,
+      "tool_calls": 7
+    }
+  }
+]

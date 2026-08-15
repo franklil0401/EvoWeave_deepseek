@@ -1,0 +1,70 @@
+diff --git a/app/config.py b/app/config.py
+index 82cc499d4f22990d4b4c6ea08dd980318f18f6ed..5ff88d54136ba7a59a690fe36f6ad93494d8062e 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -9,8 +9,8 @@ from pathlib import Path
+ 
+ 
+ DEFAULT_TRANSCRIBE_PROMPT = (
+-    "\u8fd9\u662f\u4e00\u6bb5\u4e2d\u6587\u8bfe\u5802\u6216\u7f51\u8bfe\u8bb2\u89e3\u97f3\u9891\uff0c"
+-    "\u8bf7\u8f6c\u5199\u6210\u901a\u987a\u3001\u51c6\u786e\u7684\u4e2d\u6587\u8bfe\u5802\u8bb0\u5f55\u3002"
++    "这是一段中文课堂或网课讲解音频，"
++    "请转写成通顺、准确的中文课堂记录。"
+ )
+ 
+ 
+@@ -64,6 +64,7 @@ class Settings:
+     ark_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
+     doubao_answer_model: str = "doubao-seed-2-0-lite-260428"
+     doubao_transcribe_model: str = "doubao-seed-2-0-lite-260428"
++    doubao_transcribe_prompt: str = DEFAULT_TRANSCRIBE_PROMPT
+     doubao_asr_endpoint: str = "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel"
+     doubao_asr_app_key: str = ""
+     doubao_asr_access_key: str = ""
+@@ -133,6 +134,9 @@ class Settings:
+             doubao_transcribe_model=os.environ.get(
+                 "TA_DOUBAO_TRANSCRIBE_MODEL", "doubao-seed-2-0-lite-260428"
+             ).strip(),
++            doubao_transcribe_prompt=os.environ.get(
++                "TA_DOUBAO_TRANSCRIBE_PROMPT", DEFAULT_TRANSCRIBE_PROMPT
++            ).strip(),
+             doubao_asr_endpoint=os.environ.get(
+                 "TA_DOUBAO_ASR_ENDPOINT",
+                 "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel",
+@@ -212,4 +216,4 @@ class Settings:
+             data_dir=data_path,
+             transcript_path=data_path / "transcripts.jsonl",
+             index_path=data_path / "vector_index.json",
+-        )
++        )
+\ No newline at end of file
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..a33b2d418d5ae4370d39eebdf23fa4e7d6bf9d9e 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -7,7 +7,7 @@ import base64
+ from dataclasses import dataclass
+ from pathlib import Path
+ 
+-from app.config import Settings
++from app.config import DEFAULT_TRANSCRIBE_PROMPT, Settings
+ 
+ 
+ @dataclass(frozen=True)
+@@ -121,7 +121,8 @@ class AudioTranscriber:
+                         },
+                         {
+                             "type": "text",
+-                            "text": "请把这段课堂音频准确转写成中文文字，只输出转写结果。",
++                            "text": self.settings.doubao_transcribe_prompt
++                            or DEFAULT_TRANSCRIBE_PROMPT,
+                         },
+                     ],
+                 }
+@@ -130,4 +131,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

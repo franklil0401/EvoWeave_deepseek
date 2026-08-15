@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "validation_failed",
+  "message": "验收不通过：chunk_text() 的默认参数未达到验收标准（当前 max_chars=420、overlap=60，要求 800/120）；且测试未覆盖默认值。"
+}

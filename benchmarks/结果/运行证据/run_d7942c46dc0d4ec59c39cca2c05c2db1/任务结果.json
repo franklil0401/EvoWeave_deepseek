@@ -1,0 +1,289 @@
+[
+  {
+    "agent_id": "agent_b50034340c144a28a1a9ecd9ff306d2c",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_40614b631ae94f819b1e5b6e42b4be67",
+        "created_at": "2026-08-15T14:33:07.197279Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "79f1d45ec92ed2fda319eb120ba4cfaf2da3c9cad31b0110087e7bcf27693e2f",
+        "size_bytes": 1488,
+        "storage_key": "sha256/79/79f1d45ec92ed2fda319eb120ba4cfaf2da3c9cad31b0110087e7bcf27693e2f"
+      },
+      {
+        "artifact_id": "artifact_ced20ec4619148aea8605c4f5e3623af",
+        "created_at": "2026-08-15T14:33:07.489321Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "c9495ba1338f79150b42bb5fd23fb3b49db80926d0f9ea89f411901dbb8e0c7b",
+        "size_bytes": 2007,
+        "storage_key": "sha256/c9/c9495ba1338f79150b42bb5fd23fb3b49db80926d0f9ea89f411901dbb8e0c7b"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_06da0210ecf14417b8821bc92a398853",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_7c04aa910490438f939facfdd274283e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_703f7d45654e49ccbfe04815e4423c19",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "tests/test_pipeline.py",
+        "summary": "已读取 tests/test_pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_75db603f3aa74afdadf5310fb85c51b1",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_efd1c541282d42fe89ff609700098379",
+        "kind": "file",
+        "line_end": 49,
+        "line_start": 49,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:49 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_45e5b004fccd436abdfc9e35b0de8a5c",
+        "kind": "file",
+        "line_end": 212,
+        "line_start": 212,
+        "repository_path": "sample/rag/pipeline.py",
+        "summary": "在 sample/rag/pipeline.py:212 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_297cad3d08f14fa68c893b21e67cd106",
+        "kind": "file",
+        "line_end": 11,
+        "line_start": 11,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:11 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_283d6a8268e746e48d493cfee27e0f09",
+        "kind": "file",
+        "line_end": 18,
+        "line_start": 18,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:18 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_cae6466b1d464027956a98417d2d56c2",
+        "kind": "file",
+        "line_end": 78,
+        "line_start": 78,
+        "repository_path": "rag/vector_index.py",
+        "summary": "在 rag/vector_index.py:78 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_45060491e218461cb0eb974f4164f7a6",
+        "kind": "file",
+        "line_end": 26,
+        "line_start": 26,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:26 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e0ba844af7dd404fa5b6c326087fac33",
+        "kind": "file",
+        "line_end": 56,
+        "line_start": 56,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:56 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_820cc33b788042be96bdddcf5c4c99ee",
+        "kind": "file",
+        "line_end": 79,
+        "line_start": 79,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:79 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_fcca2b7377b647debff0a202f99f9974",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_a9033374162b426aa86f4d27e6fadb98",
+        "kind": "file",
+        "line_end": 32,
+        "line_start": 32,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:32 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_3d44a3be482247a586ef46bbfb1f8b05",
+        "kind": "file",
+        "line_end": 54,
+        "line_start": 54,
+        "repository_path": "rag/pipeline.py",
+        "summary": "在 rag/pipeline.py:54 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_40614b631ae94f819b1e5b6e42b4be67",
+        "command": null,
+        "evidence_id": "evidence_f8966e6844ed4c3c87e01c0589d8aea5",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/vector_index.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_ced20ec4619148aea8605c4f5e3623af",
+        "command": null,
+        "evidence_id": "evidence_0a4500d3a95c4c9ea973a150317dd66a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/pipeline.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_679c0506feb14b248db9e44c8b26e53b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_71d96494f04c4bf6934b229d176919f7",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_82bb5e7dde704808a743ec266f810063",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_50f5bc250b0246fab5847c874c35669b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_d6596590b4324ce9b91f26af8a23f3c4",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_2f81b33e00124038aa70e7a3b94619a4",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [
+      "save() 增加 fsync，保证写入落盘后原子替换",
+      "rebuild 失败路径不修改 self.index 与磁盘文件"
+    ],
+    "status": "succeeded",
+    "summary": "已完成索引重建原子化改造：\n\n1. rag/vector_index.py：LocalVectorIndex.save() 改为原子保存——使用 tempfile.mkstemp 在同目录写临时文件，写入后 flush + fsync，再用 os.replace 原子替换正式索引文件；finally 中清理残留临时文件。失败时旧索引文件保持完好。\n\n2. rag/pipeline.py：rebuild_index() 改为先在临时 LocalVectorIndex（rebuilt）中完整重建，任何一条记录处理失败都会中止且不触碰 self.index 和磁盘文件；全部成功后才一次性把 rebuilt.documents 赋给 self.index 并调用原子 save() 提交。重建中途失败时旧索引（内存与磁盘）保持可用。\n\n验收条件均已满足：索引保存使用临时文件加原子替换；重建过程中失败不破坏旧索引。仅修改了授权范围内的 rag/pipeline.py 与 rag/vector_index.py。",
+    "task_id": "task_c1920581a30940e289697f64130ec3ba",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 106516,
+      "input_tokens": 301787,
+      "output_tokens": 16133,
+      "reasoning_tokens": 11412,
+      "steps": 11,
+      "tool_calls": 18
+    }
+  }
+]

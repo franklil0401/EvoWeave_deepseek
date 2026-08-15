@@ -1,0 +1,179 @@
+diff --git a/app/web_server.py b/app/web_server.py
+index bb9c8731dfeed2618ec99b896e03ea2811747a5d..e81604791d28cbb106b06231ccd0505f6b87a085 100644
+--- a/app/web_server.py
++++ b/app/web_server.py
+@@ -138,6 +138,33 @@ def create_app(settings: Settings | None = None) -> Flask:
+         bus.publish("status", {"message": "课堂历史已清空"})
+         return jsonify({"ok": True, "message": "本节课历史已清空"})
+ 
++    @app.post("/api/clear_qa")
++    def api_clear_qa():
++        """清空问答对话区（仅学生提问历史），不影响课堂记录与检索索引。
++
++        学生提问只追加到转录存储（source="student"），从不进入检索索引；
++        因此只需重写转录文件并保留老师课堂记录，索引文件保持不变即可。
++        """
++        store = pipeline.store
++        kept = []
++        cleared = 0
++        for record in store.iter_records():
++            if record.source == "student":
++                cleared += 1
++            else:
++                kept.append(record)
++        with store.path.open("w", encoding="utf-8") as file:
++            for record in kept:
++                file.write(json.dumps(record.to_dict(), ensure_ascii=False) + "\n")
++        bus.publish("status", {"message": "问答对话已清空，课堂记录不受影响"})
++        return jsonify({
++            "ok": True,
++            "message": "问答对话已清空，课堂记录不受影响",
++            "cleared": cleared,
++            "remaining": len(kept),
++            "scope": "question",
++        })
++
+     @app.post("/api/ask")
+     def api_ask():
+         body = request.get_json(silent=True) or {}
+@@ -215,4 +242,4 @@ def create_app(settings: Settings | None = None) -> Flask:
+             "X-Accel-Buffering": "no",
+         })
+ 
+-    return app
++    return app
+\ No newline at end of file
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..257fd88a84f2faaacaf2b94ae9b5738c772014ee 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -3,6 +3,9 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import os
++import tempfile
+ from typing import Any
+ 
+ from app.config import Settings
+@@ -73,7 +76,43 @@ class CourseRAGPipeline:
+     def recent_records(self, limit: int = 5) -> list[TranscriptRecord]:
+         return self.store.recent(limit)
+ 
++    def clear_conversation(self) -> dict[str, Any]:
++        """Clear only the student question history (conversation area).
++
++        Classroom notes (teacher records) and the retrieval index are left
++        untouched, so existing notes remain searchable after clearing.
++        """
++        kept: list[TranscriptRecord] = []
++        removed = 0
++        for record in self.store.iter_records():
++            if record.source == "student":
++                removed += 1
++            else:
++                kept.append(record)
++
++        # Rewrite the JSONL transcript atomically, keeping only non-student records.
++        fd, tmp_path = tempfile.mkstemp(
++            dir=str(self.store.path.parent),
++            prefix=".transcripts-",
++            suffix=".tmp",
++        )
++        try:
++            with os.fdopen(fd, "w", encoding="utf-8") as file:
++                for record in kept:
++                    file.write(json.dumps(record.to_dict(), ensure_ascii=False) + "\n")
++            os.replace(tmp_path, self.store.path)
++        finally:
++            if os.path.exists(tmp_path):
++                os.unlink(tmp_path)
++
++        return {
++            "ok": True,
++            "cleared_count": removed,
++            "remaining_count": len(kept),
++            "message": "问答对话已清空，课堂记录与检索索引不受影响",
++        }
++
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..7c3956cbf8963df3e2cd9a92f5e4b284e2bea0cb 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -77,3 +77,36 @@ class TranscriptStore:
+             self.path.unlink()
+         self.path.touch()
+ 
++    def clear_student_questions(self) -> dict[str, int]:
++        """Clear only student question records, keeping classroom records intact.
++
++        Only lines whose ``source`` is ``"student"`` are removed; teacher/system
++        classroom records (and therefore the retrieval index built from them)
++        are preserved. Returns a structured result:
++
++            {"removed": int, "remaining": int}
++
++        where ``removed`` is the number of student questions deleted and
++        ``remaining`` is the number of classroom records kept.
++        """
++        if not self.path.is_file():
++            return {"removed": 0, "remaining": 0}
++
++        kept_lines: list[str] = []
++        removed = 0
++        with self.path.open("r", encoding="utf-8") as file:
++            for line in file:
++                line = line.strip()
++                if not line:
++                    continue
++                raw = json.loads(line)
++                if raw.get("source") == "student":
++                    removed += 1
++                else:
++                    kept_lines.append(line)
++
++        with self.path.open("w", encoding="utf-8") as file:
++            if kept_lines:
++                file.write("\n".join(kept_lines) + "\n")
++
++        return {"removed": removed, "remaining": len(kept_lines)}
+\ No newline at end of file
+diff --git a/static/index.html b/static/index.html
+index 5baeba3c0fbdddc70fdff3b15bdfdbde3257e21d..e82d59a20f7f7a1620fb506a2979aae8dbb7d1f5 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -489,8 +489,18 @@ async function doClear() {
+ }
+ 
+ // ── clear QA ──
+-function doClearQA() {
+-  document.getElementById('qaBody').innerHTML = '';
++async function doClearQA() {
++  if (!confirm('确定清空问答对话区吗？课堂记录与检索索引不受影响。')) return;
++  try {
++    const res = await api('/api/clear_qa');
++    if (res.ok) {
++      document.getElementById('qaBody').innerHTML = '';
++    } else {
++      alert(res.message || '清空对话失败');
++    }
++  } catch (e) {
++    alert('清空对话失败：' + (e.message || e));
++  }
+ }
+ 
+ // ── source ──
+@@ -611,4 +621,4 @@ async function init() {
+ init();
+ </script>
+ </body>
+-</html>
++</html>
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..c7151704f40b4411f4b4e6028a74ab694d2afc81 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -55,15 +55,19 @@ class TranscriptStore:
+                 line = line.strip()
+                 if not line:
+                     continue
+-                raw = json.loads(line)
+-                if source is not None and raw.get("source") != source:
++                try:
++                    raw = json.loads(line)
++                    if source is not None and raw.get("source") != source:
++                        continue
++                    yield TranscriptRecord(
++                        id=str(raw["id"]),
++                        source=str(raw["source"]),
++                        text=str(raw["text"]),
++                        created_at=str(raw["created_at"]),
++                    )
++                except (ValueError, TypeError, KeyError, AttributeError):
++                    # 跳过损坏或无法解析的行，继续读取后续有效记录
+                     continue
+-                yield TranscriptRecord(
+-                    id=str(raw["id"]),
+-                    source=str(raw["source"]),
+-                    text=str(raw["text"]),
+-                    created_at=str(raw["created_at"]),
+-                )
+ 
+     def recent(self, limit: int = 5) -> list[TranscriptRecord]:
+         rows = list(self.iter_records())
+@@ -75,5 +79,4 @@ class TranscriptStore:
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file

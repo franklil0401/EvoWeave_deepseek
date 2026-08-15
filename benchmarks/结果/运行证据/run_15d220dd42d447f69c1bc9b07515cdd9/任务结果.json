@@ -1,0 +1,161 @@
+[
+  {
+    "agent_id": "agent_ce0f7c7c9d654705ade03e8ada841537",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_4d140df61ec94246899bb618e671a520",
+        "created_at": "2026-08-15T13:42:09.084781Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "35288e45ca31c590a39072d9fee7276dccddf8f3bb35a9e23b1b90be458324e1",
+        "size_bytes": 1291,
+        "storage_key": "sha256/35/35288e45ca31c590a39072d9fee7276dccddf8f3bb35a9e23b1b90be458324e1"
+      },
+      {
+        "artifact_id": "artifact_f26b0cd7819d4592ae114d8e3b729fc1",
+        "created_at": "2026-08-15T13:42:59.446056Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "ef24331cd2af87ab528332ac9e52ee1f0abe7b3ecd82290520764c622a7d6baa",
+        "size_bytes": 762,
+        "storage_key": "sha256/ef/ef24331cd2af87ab528332ac9e52ee1f0abe7b3ecd82290520764c622a7d6baa"
+      },
+      {
+        "artifact_id": "artifact_8d62dc921955486faaf3388a395613be",
+        "created_at": "2026-08-15T13:42:59.660330Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "217d49605ee71bffaf19f53b5e68f1b17976a9bf6bef7270162b3468513aa2b4",
+        "size_bytes": 1399,
+        "storage_key": "sha256/21/217d49605ee71bffaf19f53b5e68f1b17976a9bf6bef7270162b3468513aa2b4"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0723b33bbe5c4bfa91b220a73e9bad2b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_3326e18badbb4c0ab356544251ef8a15",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_4d140df61ec94246899bb618e671a520",
+        "command": null,
+        "evidence_id": "evidence_fd647359d8ac4cbe801f6969d11f1af7",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_f26b0cd7819d4592ae114d8e3b729fc1",
+        "command": null,
+        "evidence_id": "evidence_c96fdd64573b4cf497db0509d0635280",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_8d62dc921955486faaf3388a395613be",
+        "command": null,
+        "evidence_id": "evidence_c261d58c275649b0acb15def0228dc44",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/audio_listener.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0fe1120068754268bd819021ba3142e5",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9a1ad88b2a3d41709204ab87ff70e486",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_0ee409c08063423f91fe4b48d2a85814",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/audio_listener.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_0b79161698d643218945a01547e6ff3c",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_9b985cd3fb33442aa5470e849af23164",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已将音频转写短句合并阈值与强制入库超时参数化。app/config.py 新增 Settings 字段 merge_min_chars（默认 80，从 TA_MIN_CHARS 读取）和 flush_seconds（默认 5.0，从 TA_FLUSH_SECONDS 读取），并在 from_env 中从环境变量加载。app/audio_listener.py 移除了硬编码常量 _MERGE_MIN_CHARS/_MERGE_MAX_CHARS/_MERGE_FLUSH_SECONDS，合并阈值检查改用 self.settings.merge_min_chars，强制入库定时器改用 self.settings.flush_seconds。三条验收条件均满足。",
+    "task_id": "task_517a57686e9548a29405c45de51ea345",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 165671,
+      "input_tokens": 331405,
+      "output_tokens": 32109,
+      "reasoning_tokens": 8529,
+      "steps": 9,
+      "tool_calls": 12
+    }
+  }
+]
