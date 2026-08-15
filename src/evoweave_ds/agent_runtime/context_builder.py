@@ -12,8 +12,9 @@ from evoweave_ds.domain.ports import ArtifactStore
 
 
 class ContextPolicy(DomainModel):
-    max_text_chars: int = Field(default=100_000, ge=1)
+    max_text_chars: int = Field(default=250_000, ge=1)
     max_artifact_bytes: int = Field(default=10 * 1024 * 1024, ge=1)
+    max_inline_chars: int = Field(default=60_000, ge=1)
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,6 +58,11 @@ class ContextBuilder:
                         ErrorCode.CONTEXT_LIMIT_EXCEEDED,
                         f"文本产物不是有效 UTF-8：{artifact_id}",
                     ) from exc
+                if len(content) > self._policy.max_inline_chars:
+                    content = (
+                        content[: self._policy.max_inline_chars]
+                        + f"\n...[内联截断: 原始 {len(content)} 字符]"
+                    )
                 sections.append(f"产物 {artifact_id}：\n{content}")
                 included.append(artifact_id)
             else:

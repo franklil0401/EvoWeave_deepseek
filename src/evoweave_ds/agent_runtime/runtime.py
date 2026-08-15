@@ -11,7 +11,8 @@ from evoweave_ds.agent_runtime.context_builder import ContextBuilder
 from evoweave_ds.agent_runtime.decisions import (
     FinishDecision,
     ToolCallDecision,
-    parse_worker_decision,
+    WorkerDecision,
+    parse_worker_decisions,
     worker_decision_json_schema,
 )
 from evoweave_ds.agent_runtime.result_builder import ResultBuilder, build_failure_result
@@ -27,6 +28,7 @@ from evoweave_ds.domain.ports import (
     ModelGateway,
     ModelRequest,
     ModelResponse,
+    ModelToolContract,
     WorkspaceProvider,
 )
 from evoweave_ds.domain.task_result import TaskResult
@@ -93,10 +95,16 @@ class WorkerRuntime:
                     "初始文本上下文估算 Token 超过执行规格上限",
                 )
             messages = [_SYSTEM_MESSAGE, bundle.text]
-            tool_contracts = [
-                definition.model_dump(mode="json")
-                for definition in self._tool_executor.definitions_for(execution_spec.tool_names)
-            ]
+            tool_definitions = self._tool_executor.definitions_for(execution_spec.tool_names)
+            tool_contracts = [definition.model_dump(mode="json") for definition in tool_definitions]
+            gateway_tools = tuple(
+                ModelToolContract(
+                    name=definition.name.replace(".", "_"),
+                    description=definition.description,
+                    parameters=dict(definition.input_schema),
+                )
+                for definition in tool_definitions
+            )
             messages.append(
                 "本实例可用能力协议："
                 + json.dumps(tool_contracts, ensure_ascii=False, sort_keys=True)
@@ -105,13 +113,17 @@ class WorkerRuntime:
                 "Worker 决策 JSON Schema："
                 + json.dumps(worker_decision_json_schema(), ensure_ascii=False, sort_keys=True)
             )
+            messages.append(
+                "协议提醒：tool 对象只允许 action/tool_name/arguments 三个字段；"
+                "status/summary 等字段只属于 finish 对象，不要附加到 tool 对象上。"
+            )
             evidence: list[EvidenceRef] = []
             artifacts: list[ArtifactRef] = []
             decision_repair_attempts = 0
             while True:
                 tracker.record_step()
                 _assert_message_estimate(tuple(messages), execution_spec)
-                response = self._complete(execution_spec, tuple(messages))
+                response = self._complete(execution_spec, tuple(messages), gateway_tools)
                 tracker.record_model_response(response)
                 self._record(
                     execution_spec,
@@ -124,8 +136,32 @@ class WorkerRuntime:
                     },
                 )
                 try:
-                    decision = parse_worker_decision(response.text)
+                    decisions: tuple[WorkerDecision, ...]
+                    if response.tool_calls:
+                        name_by_underscore = {
+                            name.replace(".", "_"): name for name in execution_spec.tool_names
+                        }
+                        decisions = tuple(
+                            ToolCallDecision(
+                                action="tool",
+                                tool_name=name_by_underscore.get(call.name, call.name),
+                                arguments=call.arguments,
+                            )
+                            for call in response.tool_calls
+                        )
+                    else:
+                        decisions = parse_worker_decisions(response.text)
                 except DomainError as error:
+                    import os as _os
+
+                    if _os.environ.get("EVOWEAVE_DEBUG_MODEL_OUTPUT"):
+                        print(
+                            f"[debug] 模型输出被拒 (attempt={decision_repair_attempts}): "
+                            f"tools_requested={len(gateway_tools)} "
+                            f"tool_calls={response.tool_calls!r} "
+                            f"text={response.text[:800]!r}",
+                            file=__import__("sys").stderr,
+                        )
                     if (
                         error.code is not ErrorCode.INVALID_MODEL_OUTPUT
                         or decision_repair_attempts >= _MAX_DECISION_REPAIR_ATTEMPTS
@@ -146,8 +182,10 @@ class WorkerRuntime:
                             {
                                 "error_code": error.code.value,
                                 "instruction": (
-                                    "上次响应没有执行。请只返回一个符合已提供 JSON Schema 的"
-                                    "tool 或 finish 对象；不要添加第二个对象或私有推理。"
+                                    "上次响应没有执行。一次只能请求一个工具：请只返回一个"
+                                    "tool 或 finish 对象 (或单个 <invoke> 块), 不要并行请求"
+                                    "多个工具,"
+                                    "不要输出 <thought> 块或私有推理。"
                                 ),
                                 "remaining_repair_attempts": (
                                     _MAX_DECISION_REPAIR_ATTEMPTS - decision_repair_attempts
@@ -158,17 +196,20 @@ class WorkerRuntime:
                         )
                     )
                     continue
-                if isinstance(decision, FinishDecision):
-                    result = self._result_builder.build(
-                        spec=execution_spec,
-                        decision=decision,
-                        evidence=evidence,
-                        artifacts=artifacts,
-                        usage=tracker.usage(),
-                    )
-                    self._record_finished(execution_spec, result)
-                    return result
-                if isinstance(decision, ToolCallDecision):
+                for decision in decisions:
+                    if isinstance(decision, FinishDecision):
+                        result = self._result_builder.build(
+                            spec=execution_spec,
+                            decision=decision,
+                            evidence=evidence,
+                            artifacts=artifacts,
+                            usage=tracker.usage(),
+                        )
+                        self._record_finished(execution_spec, result)
+                        return result
+                    if not isinstance(decision, ToolCallDecision):
+                        continue
+                    assert isinstance(decision, ToolCallDecision)
                     tracker.record_tool_call()
                     argument_keys: list[JsonValue] = []
                     for key in sorted(decision.arguments):
@@ -266,6 +307,14 @@ class WorkerRuntime:
                         },
                     )
         except DomainError as domain_error:
+            import os as _os2
+
+            if _os2.environ.get("EVOWEAVE_DEBUG_MODEL_OUTPUT"):
+                print(
+                    f"[debug] Worker 失败: {domain_error.code.value} {domain_error.message} "
+                    f"details={domain_error.details!r} usage={tracker.usage()!r}",
+                    file=__import__("sys").stderr,
+                )
             result = build_failure_result(
                 spec=execution_spec,
                 error=domain_error,
@@ -278,12 +327,14 @@ class WorkerRuntime:
         self,
         spec: AgentExecutionSpec,
         messages: tuple[str, ...],
+        tools: tuple[ModelToolContract, ...] = (),
     ) -> ModelResponse:
         request = ModelRequest(
             model_key=spec.model_routing.selected_model_key,
             messages=messages,
             max_output_tokens=spec.runtime_limits.max_output_tokens,
             reasoning_effort=spec.model_routing.reasoning_effort,
+            tools=tools,
         )
         try:
             response = self._model_gateway.complete(request)

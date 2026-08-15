@@ -11,6 +11,7 @@ class RuntimeLimits(DomainModel):
     max_steps: int = Field(default=64, ge=1, le=10_000)
     max_input_tokens: int = Field(default=1_000_000, ge=1)
     max_output_tokens: int = Field(default=16_384, ge=1)
+    max_total_output_tokens: int = Field(default=262_144, ge=1)
     max_tool_calls: int = Field(default=64, ge=0, le=10_000)
     timeout_seconds: int = Field(default=1_800, ge=1, le=86_400)
 
@@ -35,7 +36,7 @@ class ResourceUsage(DomainModel):
 
         return (
             self.input_tokens > limits.max_input_tokens
-            or self.output_tokens + self.reasoning_tokens > limits.max_output_tokens
+            or self.output_tokens + self.reasoning_tokens > limits.max_total_output_tokens
             or self.elapsed_ms > limits.timeout_seconds * 1_000
             or self.steps > limits.max_steps
             or self.tool_calls > limits.max_tool_calls

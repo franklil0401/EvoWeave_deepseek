@@ -15,7 +15,7 @@ from evoweave_ds.domain.base import DomainModel
 from evoweave_ds.domain.enums import InputModality, ModelAvailability, ModelTier
 from evoweave_ds.domain.errors import DomainError, ErrorCode
 from evoweave_ds.domain.model_routing import ModelProfile
-from evoweave_ds.domain.ports import ModelRequest, ModelResponse
+from evoweave_ds.domain.ports import ModelRequest, ModelResponse, ModelToolCall
 
 
 class ProviderConfig(DomainModel):
@@ -122,14 +122,27 @@ class OpenAICompatibleModelGateway:
         messages: list[dict[str, object]] = [{"role": "system", "content": request.messages[0]}]
         user_text = "\n\n".join(request.messages[1:]) or request.messages[0]
         messages.append({"role": "user", "content": user_text})
+        payload_dict: dict[str, object] = {
+            "model": model_id,
+            "messages": messages,
+            "max_tokens": request.max_output_tokens,
+            "temperature": 0,
+            "reasoning_effort": request.reasoning_effort,
+        }
+        if request.tools:
+            payload_dict["tools"] = [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": tool.name,
+                        "description": tool.description,
+                        "parameters": tool.parameters,
+                    },
+                }
+                for tool in request.tools
+            ]
         payload = json.dumps(
-            {
-                "model": model_id,
-                "messages": messages,
-                "max_tokens": request.max_output_tokens,
-                "temperature": 0,
-                "reasoning_effort": request.reasoning_effort,
-            },
+            payload_dict,
             ensure_ascii=False,
             separators=(",", ":"),
         ).encode("utf-8")
@@ -145,15 +158,17 @@ class OpenAICompatibleModelGateway:
         )
         data = _response_json(response)
         try:
-            text = data["choices"][0]["message"]["content"]
+            message = data["choices"][0]["message"]
             usage = data.get("usage", {})
             details = usage.get("completion_tokens_details", {})
+            tool_calls = _parse_tool_calls(message.get("tool_calls"))
             return ModelResponse(
                 model_key=request.model_key,
-                text=_content_text(text),
+                text=_content_text(message.get("content")),
                 input_tokens=int(usage.get("prompt_tokens", 0)),
                 output_tokens=int(usage.get("completion_tokens", 0)),
                 reasoning_tokens=int(details.get("reasoning_tokens", 0)),
+                tool_calls=tool_calls,
             )
         except (KeyError, IndexError, TypeError, ValueError) as exc:
             raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型响应结构无效") from exc
@@ -285,6 +300,36 @@ def _provider_error_code(body: bytes) -> str | None:
     if not isinstance(value, str) or not value or len(value) > 128:
         return None
     return value
+
+
+def _parse_tool_calls(value: object) -> tuple[ModelToolCall, ...]:
+    """Parse structured tool calls from an OpenAI-compatible response."""
+
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 结构无效")
+    calls: list[ModelToolCall] = []
+    for item in value:
+        if not isinstance(item, dict):
+            raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 结构无效")
+        function = item.get("function")
+        if not isinstance(function, dict):
+            raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 结构无效")
+        name = function.get("name")
+        raw_arguments = function.get("arguments")
+        if not isinstance(name, str) or not isinstance(raw_arguments, str):
+            raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 结构无效")
+        try:
+            arguments = json.loads(raw_arguments)
+        except json.JSONDecodeError as exc:
+            raise DomainError(
+                ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 参数不是 JSON"
+            ) from exc
+        if not isinstance(arguments, dict):
+            raise DomainError(ErrorCode.INVALID_MODEL_OUTPUT, "模型 tool_calls 参数不是对象")
+        calls.append(ModelToolCall(name=name, arguments=arguments))
+    return tuple(calls)
 
 
 def _content_text(value: object) -> str:

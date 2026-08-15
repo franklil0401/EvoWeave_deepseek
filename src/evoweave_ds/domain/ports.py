@@ -21,11 +21,29 @@ from evoweave_ds.domain.task_spec import TaskSpec
 
 
 @dataclass(frozen=True, slots=True)
+class ModelToolContract:
+    """One tool contract sent to the model gateway (name uses underscore form)."""
+
+    name: str
+    description: str
+    parameters: dict[str, object]
+
+
+@dataclass(frozen=True, slots=True)
+class ModelToolCall:
+    """A structured tool call returned by the gateway (name uses underscore form)."""
+
+    name: str
+    arguments: dict[str, JsonValue]
+
+
+@dataclass(frozen=True, slots=True)
 class ModelRequest:
     model_key: str
     messages: tuple[str, ...]
     max_output_tokens: int
     reasoning_effort: Literal["low", "medium", "high"] = "low"
+    tools: tuple[ModelToolContract, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.model_key or not self.messages:
@@ -41,6 +59,7 @@ class ModelResponse:
     input_tokens: int = 0
     output_tokens: int = 0
     reasoning_tokens: int = 0
+    tool_calls: tuple[ModelToolCall, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.model_key:

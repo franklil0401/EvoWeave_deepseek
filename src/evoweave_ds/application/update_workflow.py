@@ -338,6 +338,7 @@ class SingleTaskUpdateWorkflow:
                 and item.line_count > 0
                 and item.path.casefold().endswith(".py")
                 and "__pycache__" not in item.path.casefold().split("/")
+                and item.path.casefold().startswith("tests/")
             )
             commands = (
                 *PythonValidationPlanBuilder().build(

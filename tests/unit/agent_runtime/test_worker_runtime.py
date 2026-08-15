@@ -403,7 +403,7 @@ def test_token_limit_stops_before_parsing_model_decision() -> None:
             run_id=run_id,
             task_id=task_id,
             tools=("file.read",),
-            limits=RuntimeLimits(max_output_tokens=10),
+            limits=RuntimeLimits(max_total_output_tokens=10),
         )
     )
     assert result.failure is not None

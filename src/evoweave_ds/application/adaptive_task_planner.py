@@ -81,7 +81,7 @@ class AdaptiveTaskPlanner:
             objective=change.objective,
             acceptance_criteria=change.acceptance_criteria,
             allowed_paths=change.allowed_paths,
-            groups=initial_groups,
+            groups=groups,
             files=profile.files,
         )
         readable_paths = tuple(item.path for item in profile.files if item.line_count > 0)

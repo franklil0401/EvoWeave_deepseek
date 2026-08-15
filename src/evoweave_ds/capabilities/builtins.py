@@ -86,7 +86,11 @@ class FileSearchCapability:
         matches: list[JsonValue] = []
         evidence: list[EvidenceRef] = []
         for path in context.workspace.list_paths(parsed.prefix):
-            content = context.workspace.read_text(path)
+            try:
+                content = context.workspace.read_text(path)
+            except DomainError:
+                # 非 UTF-8 或不可读文件不参与文本搜索, 避免单个文件阻断整个搜索
+                continue
             for line_number, line in enumerate(content.splitlines(), start=1):
                 if parsed.query not in line:
                     continue

@@ -34,7 +34,9 @@ class PythonValidationPlanBuilder:
             ValidationCommand(
                 command_id=SpecId.new(),
                 name="全量回归",
-                argv=("python", "-m", "pytest", "-q"),
+                # 显式限定 tests 目录, 避免收集仓库其他目录 (如 sample/) 导致
+                # 额外目录进入 sys.path 而遮蔽项目包.
+                argv=("python", "-m", "pytest", "-q", "tests"),
                 scope=ValidationScope.FULL,
                 timeout_seconds=timeout_seconds,
             ),

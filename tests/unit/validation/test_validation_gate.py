@@ -154,7 +154,7 @@ def test_python_plan_contains_local_impact_full_and_ruff_gates() -> None:
     ]
     assert commands[0].argv[-1] == "tests/test_local.py"
     assert commands[1].argv[-1] == "tests/test_impact.py"
-    assert commands[2].argv == ("python", "-m", "pytest", "-q")
+    assert commands[2].argv == ("python", "-m", "pytest", "-q", "tests")
     assert commands[3].argv == ("python", "-m", "ruff", "check", ".")
 
 

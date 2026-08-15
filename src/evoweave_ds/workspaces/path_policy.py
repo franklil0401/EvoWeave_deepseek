@@ -43,8 +43,9 @@ class WorkspacePathPolicy:
         return normalized, candidate
 
     def normalize_list_prefix(self, prefix: str) -> str:
+        # 列举起点只做路径规范化与逃逸防护; 最终按文件级 read_scope 过滤,
+        # 因此允许目录级 prefix (目录本身无需出现在文件级 scope 列表中).
         normalized = self._normalize(prefix)
-        self._assert_scope(normalized, self._read_scope, "列举")
         candidate = self._root.joinpath(*normalized.split("/"))
         self._assert_components_safe(candidate)
         return normalized
