@@ -1,0 +1,315 @@
+{
+  "suite_id": "evoweave_ds_flask_v1",
+  "version": 1,
+  "hidden_acceptance_source": "benchmarks/任务集/隐藏验收/hidden_acceptance_flask.py",
+  "hidden_acceptance_sha256": "f193af3b82d45373da331905299c92ad456babf310946ff1927f1f6701e41ed3",
+  "tasks": [
+    {
+      "benchmark_id": "bench-11-static-cache-extension",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "按文件扩展名提供静态文件默认缓存时间：get_send_file_max_age 在 SEND_FILE_MAX_AGE_DEFAULT 未设置时，按扩展名返回默认 max_age（如 .png/.jpg/.css 返回 3600，.html 返回 0），扩展名未知时返回 None 保持现状",
+      "acceptance_criteria": [
+        "SEND_FILE_MAX_AGE_DEFAULT 未设置时 .png 文件返回 3600",
+        "SEND_FILE_MAX_AGE_DEFAULT 未设置时 .html 文件返回 0",
+        "未知扩展名仍返回 None"
+      ],
+      "allowed_paths": [
+        "src/flask/app.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/app.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_helpers.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-12-json-sort-config",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "JSON 输出键排序可配置：DefaultJSONProvider.dumps 在调用时优先读取 app.config 的 JSON_SORT_KEYS（未设置时回退到类属性 sort_keys），使应用可在运行时关闭键排序",
+      "acceptance_criteria": [
+        "app.config 设置 JSON_SORT_KEYS=False 时 dumps 不排序键",
+        "未设置 JSON_SORT_KEYS 时保持类属性 sort_keys 行为",
+        "JSON_SORT_KEYS=True 时 dumps 排序键"
+      ],
+      "allowed_paths": [
+        "src/flask/json/provider.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/json/provider.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_json.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-13-envvar-required",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "配置加载的必需环境变量语义：Config.from_envvar 增加 required 参数（默认 False 保持现状），required=True 且环境变量未设置时抛出明确错误，而不是 silent=False 的通用 RuntimeError",
+      "acceptance_criteria": [
+        "from_envvar 支持 required 参数",
+        "required=True 且变量缺失时抛出指明变量名的错误",
+        "默认行为(required=False)与现状一致"
+      ],
+      "allowed_paths": [
+        "src/flask/config.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/config.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_config.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-14-namespace-lower-option",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "配置命名空间大小写保留：Config.get_namespace 增加 lower 参数（默认 True 保持现状），lower=False 时保留原始键名大小写，便于读取混合大小写环境变量",
+      "acceptance_criteria": [
+        "get_namespace 支持 lower 参数",
+        "lower=False 时保留原始键名大小写",
+        "默认 lower=True 与现状一致"
+      ],
+      "allowed_paths": [
+        "src/flask/config.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "low",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/config.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_config.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_file"
+      ]
+    },
+    {
+      "benchmark_id": "bench-15-client-redirect-config",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "测试客户端重定向跟随默认值可配置：FlaskClient.open 在未显式传 follow_redirects 时，读取 app.config 的 TESTING_FOLLOW_REDIRECTS（未设置时保持现状 False），使测试套件可统一开启重定向跟随",
+      "acceptance_criteria": [
+        "TESTING_FOLLOW_REDIRECTS=True 时未显式传参的请求自动跟随重定向",
+        "未设置 TESTING_FOLLOW_REDIRECTS 时保持现状",
+        "显式传 follow_redirects 优先于配置"
+      ],
+      "allowed_paths": [
+        "src/flask/testing.py",
+        "src/flask/app.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/testing.py",
+        "src/flask/app.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_testing.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_serial"
+      ]
+    },
+    {
+      "benchmark_id": "bench-16-methods-validate-option",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "路由方法校验可选开关：Flask.add_url_rule 增加 validate_methods 参数（默认 False 保持现状），validate_methods=True 时校验显式 methods 与视图支持的方法一致，不一致抛出 ValueError 指明冲突方法",
+      "acceptance_criteria": [
+        "add_url_rule 支持 validate_methods 参数",
+        "validate_methods=True 且方法冲突时抛出 ValueError",
+        "默认 validate_methods=False 与现状一致"
+      ],
+      "allowed_paths": [
+        "src/flask/app.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/app.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_basic.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "single_module"
+      ]
+    },
+    {
+      "benchmark_id": "bench-17-static-security-headers",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "静态文件安全响应头：send_static_file 返回的响应默认附加 X-Content-Type-Options: nosniff 头（可用 SEND_STATIC_SECURITY_HEADERS 配置关闭），降低 MIME 嗅探风险",
+      "acceptance_criteria": [
+        "send_static_file 响应包含 X-Content-Type-Options: nosniff",
+        "SEND_STATIC_SECURITY_HEADERS=False 时不附加该头",
+        "默认行为附加安全头"
+      ],
+      "allowed_paths": [
+        "src/flask/helpers.py",
+        "src/flask/app.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "medium",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/app.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_helpers.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_serial"
+      ]
+    },
+    {
+      "benchmark_id": "bench-18-errorhandler-dispatch",
+      "repository_source": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "repository_fixture": "flask",
+      "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
+      "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "objective": "HTTP 异常处理的可覆盖能力：Flask.handle_http_exception 对未被显式注册处理器的 HTTPException 增加可配置的默认响应模板钩子（handle_http_exception 中调用可覆盖的 make_http_error_response），便于应用统一错误页格式",
+      "acceptance_criteria": [
+        "存在可覆盖的 make_http_error_response 钩子方法",
+        "子类覆盖钩子后 404 响应使用自定义格式",
+        "默认行为与现状一致"
+      ],
+      "allowed_paths": [
+        "src/flask/app.py"
+      ],
+      "forbidden_paths": [],
+      "human_difficulty": "high",
+      "required_modalities": [
+        "text"
+      ],
+      "gold_paths": [
+        "src/flask/app.py"
+      ],
+      "validation_argv": [
+        [
+          "python",
+          "-m",
+          "pytest",
+          "-q",
+          "tests/test_user_error_handler.py"
+        ]
+      ],
+      "baseline_status": "passing",
+      "scenario_tags": [
+        "multi_parallel"
+      ]
+    }
+  ]
+}
