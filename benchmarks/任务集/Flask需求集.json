@@ -21,7 +21,7 @@
         "src/flask/app.py"
       ],
       "forbidden_paths": [],
-      "human_difficulty": "medium",
+      "human_difficulty": "low",
       "required_modalities": [
         "text"
       ],
@@ -49,10 +49,10 @@
       "external_repository": "E:/mutil_Agent/deepseek/exp-repos/flask_probe",
       "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
-      "objective": "JSON 输出键排序可配置：DefaultJSONProvider.dumps 在调用时优先读取 app.config 的 JSON_SORT_KEYS（未设置时回退到类属性 sort_keys），使应用可在运行时关闭键排序",
+      "objective": "JSON 输出键排序可配置: DefaultJSONProvider.dumps 在调用时优先读取 app.config 的 JSON_SORT_KEYS(未设置时沿用类属性 sort_keys), 使应用可在运行时关闭键排序",
       "acceptance_criteria": [
         "app.config 设置 JSON_SORT_KEYS=False 时 dumps 不排序键",
-        "未设置 JSON_SORT_KEYS 时保持类属性 sort_keys 行为",
+        "未设置 JSON_SORT_KEYS 时沿用类属性 sort_keys 行为",
         "JSON_SORT_KEYS=True 时 dumps 排序键"
       ],
       "allowed_paths": [
@@ -174,7 +174,7 @@
         "src/flask/app.py"
       ],
       "forbidden_paths": [],
-      "human_difficulty": "medium",
+      "human_difficulty": "low",
       "required_modalities": [
         "text"
       ],
@@ -213,7 +213,7 @@
         "src/flask/app.py"
       ],
       "forbidden_paths": [],
-      "human_difficulty": "medium",
+      "human_difficulty": "high",
       "required_modalities": [
         "text"
       ],
@@ -252,7 +252,7 @@
         "src/flask/app.py"
       ],
       "forbidden_paths": [],
-      "human_difficulty": "medium",
+      "human_difficulty": "high",
       "required_modalities": [
         "text"
       ],
@@ -290,7 +290,7 @@
         "src/flask/app.py"
       ],
       "forbidden_paths": [],
-      "human_difficulty": "high",
+      "human_difficulty": "medium",
       "required_modalities": [
         "text"
       ],

@@ -1,0 +1,318 @@
+{
+  "report_id": "spec_12eacb5b0b6b43af80052f0e49880ed5",
+  "run_id": "run_7181e88ab26944a8bf40c49e2524ac39",
+  "integration_id": "integration_ba65f5cac0364e5ea18928fd21c5ae1f",
+  "base_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+  "candidate_commit": "0c3d131c62196ff5a9c19edac7771deda1d9fe56",
+  "accepted": false,
+  "applied_patches": [
+    {
+      "sequence": 1,
+      "artifact_id": "artifact_4d0c44e48d854670a1e020c44f934ca8",
+      "task_id": "task_c79a915839714864995921446dd4d809",
+      "before_commit": "c40a5a78bc3e0b549932129713ac65806815c579",
+      "after_commit": "0c3d131c62196ff5a9c19edac7771deda1d9fe56",
+      "changed_paths": [
+        "rag/pipeline.py",
+        "rag/vector_index.py"
+      ],
+      "applied_at": "2026-08-16T10:53:21.370313Z"
+    }
+  ],
+  "observations": [
+    {
+      "command_id": "spec_b48904b2de2c434f890b95e777ba578e",
+      "command_name": "局部测试",
+      "scope": "local",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_pipeline.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 625,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_226d279f33ab48978ce57dccc0ebeadc",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 389,
+        "sha256": "32328550f1abafc3bec5158234c0404f0cdaf063a35e184c6d083d371c9e481f",
+        "storage_key": "sha256/32/32328550f1abafc3bec5158234c0404f0cdaf063a35e184c6d083d371c9e481f",
+        "created_at": "2026-08-16T10:53:22.720995Z"
+      }
+    },
+    {
+      "command_id": "spec_b8169e8e131d4a30bf785c9d1cfbbc1d",
+      "command_name": "影响测试",
+      "scope": "impact",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_pipeline.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 516,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_b5bc2c4865f34b1a89236fb9ff8d445d",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 390,
+        "sha256": "364d7086db029f3a4accb1e0aaf820b8f4203eebd200edd1500803e0a6f8a1ae",
+        "storage_key": "sha256/36/364d7086db029f3a4accb1e0aaf820b8f4203eebd200edd1500803e0a6f8a1ae",
+        "created_at": "2026-08-16T10:53:23.504253Z"
+      }
+    },
+    {
+      "command_id": "spec_a46922b2b4584e1b8ffefce64c917f2f",
+      "command_name": "全量回归",
+      "scope": "full",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 592,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_cb4dc43cb50b45c8aa143534f93e2aa1",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 371,
+        "sha256": "5c420c6b9d5cd8ff270b1bdf1327d5e20a6968491d69f1c143168216787d1e39",
+        "storage_key": "sha256/5c/5c420c6b9d5cd8ff270b1bdf1327d5e20a6968491d69f1c143168216787d1e39",
+        "created_at": "2026-08-16T10:53:24.383906Z"
+      }
+    },
+    {
+      "command_id": "spec_eb9bc1fe4c9a41488a8efe280ad37e83",
+      "command_name": "Ruff 门禁",
+      "scope": "lint",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 156,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_c705c4b24c434bff928604852f721120",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 282,
+        "sha256": "788625bd25c11740619c32505bf1062960874249f1553bdb7a934f4e30010d6a",
+        "storage_key": "sha256/78/788625bd25c11740619c32505bf1062960874249f1553bdb7a934f4e30010d6a",
+        "created_at": "2026-08-16T10:53:24.788603Z"
+      }
+    },
+    {
+      "command_id": "spec_b39795fc7ac9408b88ac4070cd01b0b2",
+      "command_name": "隐藏验收:bench-06-atomic-rebuild",
+      "scope": "full",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "E:\\mutil_Agent\\deepseek\\EvoWeave_deepseek\\benchmarks\\任务集\\隐藏验收\\hidden_acceptance.py",
+        "bench-06-atomic-rebuild"
+      ],
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 77,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_b39795fc7ac9408b88ac4070cd01b0b2:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_f9c316b76e0b42e1bab8f27fcea290dd",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 459,
+        "sha256": "8f016b15ecba6e18babcb7d7cfd9ae2b4a1132e1104e52ac42244c7c75ff19d2",
+        "storage_key": "sha256/8f/8f016b15ecba6e18babcb7d7cfd9ae2b4a1132e1104e52ac42244c7c75ff19d2",
+        "created_at": "2026-08-16T10:53:25.097439Z"
+      }
+    },
+    {
+      "command_id": "spec_b48904b2de2c434f890b95e777ba578e",
+      "command_name": "局部测试",
+      "scope": "local",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_pipeline.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 547,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_dd2db5f151194c4facb4ab01bdb51870",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 390,
+        "sha256": "6e2a168c470852c9aaf85fe7c15d6826986807af0b9aeaf15ffe24b5c6a6fda3",
+        "storage_key": "sha256/6e/6e2a168c470852c9aaf85fe7c15d6826986807af0b9aeaf15ffe24b5c6a6fda3",
+        "created_at": "2026-08-16T10:53:25.898522Z"
+      }
+    },
+    {
+      "command_id": "spec_b8169e8e131d4a30bf785c9d1cfbbc1d",
+      "command_name": "影响测试",
+      "scope": "impact",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_pipeline.py"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 484,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_7f0acc5ecdf640a3b6216abcb022722c",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 391,
+        "sha256": "34a7f2ddf449354ebecd80f32e0d774a93f3e06020524d556e3d89fb1c1bd9a3",
+        "storage_key": "sha256/34/34a7f2ddf449354ebecd80f32e0d774a93f3e06020524d556e3d89fb1c1bd9a3",
+        "created_at": "2026-08-16T10:53:26.606481Z"
+      }
+    },
+    {
+      "command_id": "spec_a46922b2b4584e1b8ffefce64c917f2f",
+      "command_name": "全量回归",
+      "scope": "full",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 531,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_f1b0ea5bc91041d99e538f771ced4d98",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 372,
+        "sha256": "69f588761db1f96b9d815023b6522590cedb5e8730cec0e61ed79f2f6ccdac75",
+        "storage_key": "sha256/69/69f588761db1f96b9d815023b6522590cedb5e8730cec0e61ed79f2f6ccdac75",
+        "created_at": "2026-08-16T10:53:27.380852Z"
+      }
+    },
+    {
+      "command_id": "spec_eb9bc1fe4c9a41488a8efe280ad37e83",
+      "command_name": "Ruff 门禁",
+      "scope": "lint",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 125,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_13ee5cf989f44f6f98e2ad7e4cba3613",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 283,
+        "sha256": "2bc567695b0b27df4d61a5dac4bda20f6b3da491bf64bc25333b5b304efb5ca0",
+        "storage_key": "sha256/2b/2bc567695b0b27df4d61a5dac4bda20f6b3da491bf64bc25333b5b304efb5ca0",
+        "created_at": "2026-08-16T10:53:27.765293Z"
+      }
+    },
+    {
+      "command_id": "spec_b39795fc7ac9408b88ac4070cd01b0b2",
+      "command_name": "隐藏验收:bench-06-atomic-rebuild",
+      "scope": "full",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "E:\\mutil_Agent\\deepseek\\EvoWeave_deepseek\\benchmarks\\任务集\\隐藏验收\\hidden_acceptance.py",
+        "bench-06-atomic-rebuild"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 62,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_ddd3efce22804d0d95fb371dc21bf1de",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 427,
+        "sha256": "b2ed66b6d95041bcabe66537e9b701c8fa6cb6ebae8702d1903b8551a3c3a754",
+        "storage_key": "sha256/b2/b2ed66b6d95041bcabe66537e9b701c8fa6cb6ebae8702d1903b8551a3c3a754",
+        "created_at": "2026-08-16T10:53:28.081992Z"
+      }
+    }
+  ],
+  "failure_deltas": [
+    {
+      "command_id": "spec_b39795fc7ac9408b88ac4070cd01b0b2",
+      "failure_key": "command:spec_b39795fc7ac9408b88ac4070cd01b0b2:nonzero",
+      "classification": "resolved"
+    }
+  ],
+  "report_ref": {
+    "artifact_id": "artifact_3972fd095ebd452a863015d431b70637",
+    "kind": "test_report",
+    "media_type": "application/json",
+    "size_bytes": 9946,
+    "sha256": "629cf07fda5147854cc6322854db263f2df178a49af1f5541388b29713716d53",
+    "storage_key": "sha256/62/629cf07fda5147854cc6322854db263f2df178a49af1f5541388b29713716d53",
+    "created_at": "2026-08-16T10:53:28.314870Z"
+  }
+}

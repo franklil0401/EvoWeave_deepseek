@@ -1,0 +1,85 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..fdb5e5c6e2e72d7b3c70b2b49a23ff28160d656e 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -47,13 +47,21 @@ class CourseRAGPipeline:
+         self.index.add(chunks, metas)
+ 
+     def rebuild_index(self) -> int:
++        # Clear only the in-memory documents; the previously persisted index file
++        # is left untouched. If any step fails below, the old index on disk stays
++        # intact and usable because save() only happens after a successful rebuild.
+         self.index.clear()
+         count = 0
+-        for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
+-        self.index.save()
++        try:
++            for record in self.store.iter_records(source="teacher"):
++                before = len(self.index.documents)
++                self._index_record(record)
++                count += len(self.index.documents) - before
++            self.index.save()
++        except Exception:
++            # Do not write a partial index; keep the previous one usable.
++            self.index.load()
++            raise
+         return count
+ 
+     def retrieve(self, question: str, top_k: int | None = None) -> list[dict[str, Any]]:
+@@ -76,4 +84,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..faa08f2411b390a4de66539efa1c9d66b325ba74 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +91,20 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Atomically persist the index by writing a temp file then replacing."""
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
+-            json.dump(payload, file, ensure_ascii=False, indent=2)
++        tmp_path = self.path.with_name(self.path.name + ".tmp")
++        try:
++            with tmp_path.open("w", encoding="utf-8") as file:
++                json.dump(payload, file, ensure_ascii=False, indent=2)
++            os.replace(tmp_path, self.path)
++        finally:
++            # Clean up the temp file if the write or replace failed midway.
++            if tmp_path.exists():
++                try:
++                    tmp_path.unlink()
++                except OSError:
++                    pass
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -123,7 +135,6 @@ class LocalVectorIndex:
+         return scored[: max(0, top_k)]
+ 
+     def clear(self) -> None:
+-        self.documents = []
+-        if self.path.exists():
+-            self.path.unlink()
+-
++        # Only clear in-memory documents. The on-disk index is left untouched so
++        # an interrupted rebuild keeps the previous persisted index usable.
++        self.documents = []
+\ No newline at end of file
