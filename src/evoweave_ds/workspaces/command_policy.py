@@ -53,6 +53,14 @@ class LocalWorkspaceCommandRunner:
         if timeout_seconds > self._policy.max_timeout_seconds:
             raise DomainError(ErrorCode.COMMAND_DENIED, "命令超时参数超过沙箱策略上限")
         environment = sanitized_environment()
+        # src 布局仓库(如 Flask)的测试需要 PYTHONPATH=src 才能 import 项目包;
+        # web_learning_tool 这类根布局仓库无 src 目录, 该注入无影响。
+        src_dir = self._root / "src"
+        if src_dir.is_dir():
+            existing = environment.get("PYTHONPATH", "")
+            environment["PYTHONPATH"] = (
+                str(src_dir) + (";" + existing if existing else "")
+            )
         executable = shutil.which(argv[0], path=environment.get("PATH"))
         if executable is None:
             raise DomainError(ErrorCode.COMMAND_DENIED, "找不到授权命令的可执行文件")
