@@ -1,0 +1,110 @@
+[
+  {
+    "agent_id": "agent_ab19442e2d304b2fa437a99cc533c094",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_be5e65743aac45868ba6af3e0fe16d42",
+        "created_at": "2026-08-15T13:21:01.496506Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "64244e2f4deeffca637380372523b2ffd4b7a70c118563253ca040f92ebc66f7",
+        "size_bytes": 646,
+        "storage_key": "sha256/64/64244e2f4deeffca637380372523b2ffd4b7a70c118563253ca040f92ebc66f7"
+      },
+      {
+        "artifact_id": "artifact_26cfb3bf9b444bddb3a7bec22cd4a8e3",
+        "created_at": "2026-08-15T13:21:01.721994Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "f2949b5d6441872dce9dac7553684d0cabe4c9dfd30acd183d34a0faa7cf3e03",
+        "size_bytes": 602,
+        "storage_key": "sha256/f2/f2949b5d6441872dce9dac7553684d0cabe4c9dfd30acd183d34a0faa7cf3e03"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_1c900a8539344f58ab28ca9081accac2",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6bb7fa5156af46699ccbf8fdae97001c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_be5e65743aac45868ba6af3e0fe16d42",
+        "command": null,
+        "evidence_id": "evidence_ef0ac82c270140b993bd2c1f5e2ec36a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_26cfb3bf9b444bddb3a7bec22cd4a8e3",
+        "command": null,
+        "evidence_id": "evidence_aa95d6294f2845eeae570466d34bb9b6",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/pipeline.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9f1659eee1dc48a49a9c1666fb2af824",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_db15823003fb43569003c8124315a410",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_72ddfff2ecec401893bcb5ab8ce44be8",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已在 rag/transcript_store.py 与 rag/pipeline.py 中为 recent / recent_records 增加可选 source 参数：\n\n- TranscriptStore.recent(limit=5, source=None)：调用 iter_records(source=source)，提供 source 时按来源过滤，未提供时返回全部，行为与原实现一致。\n- CourseRAGPipeline.recent_records(limit=5, source=None)：将 source 转发给 store.recent。\n\n验收条件均满足：recent 支持 source 过滤；未提供 source 时行为与原来一致。仅修改了授权范围内的两个文件。",
+    "task_id": "task_97042cd0a6664acd966c846ca091a656",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 19734,
+      "input_tokens": 114520,
+      "output_tokens": 2763,
+      "reasoning_tokens": 741,
+      "steps": 5,
+      "tool_calls": 7
+    }
+  }
+]

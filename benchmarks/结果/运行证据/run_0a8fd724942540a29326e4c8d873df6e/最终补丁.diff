@@ -1,0 +1,127 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..fc523c63debd2383c757acfbd5819306e1ceee1a 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -6,6 +6,7 @@ from __future__ import annotations
+ import base64
+ from dataclasses import dataclass
+ from pathlib import Path
++from typing import Callable
+ 
+ from app.config import Settings
+ 
+@@ -67,6 +68,29 @@ class AudioTranscriber:
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _run_with_retry(
++        self,
++        attempt: Callable[[], str],
++        provider: str,
++        display_name: str,
++    ) -> TranscriptionResult:
++        """执行云端转写：网络或服务异常时自动重试一次，仍失败则回退为结构化结果。
++
++        配置缺失、依赖缺失等本地问题在进入本方法前就已抛出，
++        这里只兜底真正发生在云端调用过程中的网络/服务异常。
++        """
++        try:
++            return TranscriptionResult(text=attempt(), provider=provider)
++        except Exception as exc:
++            try:
++                return TranscriptionResult(text=attempt(), provider=provider)
++            except Exception as retry_exc:
++                return TranscriptionResult(
++                    text="",
++                    provider=provider,
++                    warning=f"{display_name}转写失败，已自动重试一次仍失败：{retry_exc}",
++                )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -81,16 +105,18 @@ class AudioTranscriber:
+             kwargs["base_url"] = self.settings.openai_base_url
+         client = OpenAI(**kwargs)
+ 
+-        with wav_path.open("rb") as audio_file:
+-            response = client.audio.transcriptions.create(
+-                model=self.settings.openai_transcribe_model,
+-                file=audio_file,
+-                response_format="text",
+-                prompt=self.settings.openai_transcribe_prompt or None,
+-            )
++        def _attempt() -> str:
++            with wav_path.open("rb") as audio_file:
++                response = client.audio.transcriptions.create(
++                    model=self.settings.openai_transcribe_model,
++                    file=audio_file,
++                    response_format="text",
++                    prompt=self.settings.openai_transcribe_prompt or None,
++                )
++            text = response if isinstance(response, str) else getattr(response, "text", "")
++            return (text or "").strip()
+ 
+-        text = response if isinstance(response, str) else getattr(response, "text", "")
+-        return TranscriptionResult(text=(text or "").strip(), provider="openai")
++        return self._run_with_retry(_attempt, provider="openai", display_name="OpenAI")
+ 
+     def _transcribe_doubao(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.ark_api_key:
+@@ -105,29 +131,30 @@ class AudioTranscriber:
+             api_key=self.settings.ark_api_key,
+             base_url=self.settings.ark_base_url,
+         )
+-        encoded_audio = base64.b64encode(wav_path.read_bytes()).decode("utf-8")
+-        response = client.chat.completions.create(
+-            model=self.settings.doubao_transcribe_model,
+-            messages=[
+-                {
+-                    "role": "user",
+-                    "content": [
+-                        {
+-                            "type": "input_audio",
+-                            "input_audio": {
+-                                "data": encoded_audio,
+-                                "format": "wav",
++
++        def _attempt() -> str:
++            encoded_audio = base64.b64encode(wav_path.read_bytes()).decode("utf-8")
++            response = client.chat.completions.create(
++                model=self.settings.doubao_transcribe_model,
++                messages=[
++                    {
++                        "role": "user",
++                        "content": [
++                            {
++                                "type": "input_audio",
++                                "input_audio": {
++                                    "data": encoded_audio,
++                                    "format": "wav",
++                                },
+                             },
+-                        },
+-                        {
+-                            "type": "text",
+-                            "text": "请把这段课堂音频准确转写成中文文字，只输出转写结果。",
+-                        },
+-                    ],
+-                }
+-            ],
+-        )
+-        return TranscriptionResult(
+-            text=response.choices[0].message.content.strip(),
+-            provider="doubao",
+-        )
++                            {
++                                "type": "text",
++                                "text": "请把这段课堂音频准确转写成中文文字，只输出转写结果。",
++                            },
++                        ],
++                    }
++                ],
++            )
++            return response.choices[0].message.content.strip()
++
++        return self._run_with_retry(_attempt, provider="doubao", display_name="豆包")
+\ No newline at end of file

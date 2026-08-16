@@ -1,0 +1,42 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..bd1b30a0631637f9ce466d266b451ef0e8f0c8e5 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -70,10 +70,10 @@ class CourseRAGPipeline:
+             lines.append(f"[课堂片段 {index}] {item['text']}")
+         return "\n".join(lines)
+ 
+-    def recent_records(self, limit: int = 5) -> list[TranscriptRecord]:
+-        return self.store.recent(limit)
++    def recent_records(self, limit: int = 5, source: str | None = None) -> list[TranscriptRecord]:
++        return self.store.recent(limit, source)
+ 
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..0d9bece17ae0c3e574a060dd2f19aa2df0c154be 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -65,8 +65,8 @@ class TranscriptStore:
+                     created_at=str(raw["created_at"]),
+                 )
+ 
+-    def recent(self, limit: int = 5) -> list[TranscriptRecord]:
+-        rows = list(self.iter_records())
++    def recent(self, limit: int = 5, source: str | None = None) -> list[TranscriptRecord]:
++        rows = list(self.iter_records(source))
+         return rows[-max(0, limit) :]
+ 
+     def count(self) -> int:
+@@ -75,5 +75,4 @@ class TranscriptStore:
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file

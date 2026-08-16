@@ -1,0 +1,56 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..09a3a6972af9d256913983effb3c350d57171020 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -10,6 +10,10 @@ from pathlib import Path
+ from app.config import Settings
+ 
+ 
++# 网络/服务异常时的额外重试次数（首次失败后自动重试一次）
++_TRANSCRIBE_RETRIES = 1
++
++
+ @dataclass(frozen=True)
+ class TranscriptionResult:
+     text: str
+@@ -59,14 +63,29 @@ class AudioTranscriber:
+ 
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+-        if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
+-        if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++        if provider in {"openai", "doubao"}:
++            return self._transcribe_with_retry(provider, Path(wav_path))
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_with_retry(self, provider: str, wav_path: Path) -> TranscriptionResult:
++        """调用云端转写，网络/服务异常时自动重试一次；仍失败则回退并返回结构化结果。"""
++        last_error: Exception | None = None
++        for _ in range(_TRANSCRIBE_RETRIES + 1):
++            try:
++                if provider == "openai":
++                    return self._transcribe_openai(wav_path)
++                return self._transcribe_doubao(wav_path)
++            except Exception as exc:
++                last_error = exc
++        provider_name = "豆包" if provider == "doubao" else "OpenAI"
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"{provider_name}音频转写失败（已自动重试一次，仍失败）：{last_error}",
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -130,4 +149,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file
