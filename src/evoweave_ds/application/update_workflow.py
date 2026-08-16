@@ -237,6 +237,7 @@ class SingleTaskUpdateWorkflow:
                             timeout_seconds=self._config.max_worker_seconds,
                         ),
                     ),
+                    continuable=self._config.worker_continuation,
                 )
                 if not batch:
                     raise DomainError(ErrorCode.INVALID_GRAPH, "任务图没有可执行任务且尚未完成")

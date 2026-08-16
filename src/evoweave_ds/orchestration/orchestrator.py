@@ -198,6 +198,7 @@ class Orchestrator:
         scheduler: Scheduler,
         agent_factory: AgentFactory,
         capability_plan_for: Callable[[TaskId], CapabilityPlan],
+        continuable: bool = False,
     ) -> tuple[AgentExecutionSpec, ...]:
         if self._finished:
             return ()
@@ -218,6 +219,7 @@ class Orchestrator:
                     task_spec=self._graph.spec_for(task_id),
                     capability_plan=capability_plan_for(task_id),
                     version=max(prior_versions, default=0) + 1,
+                    continuable=continuable,
                 )
                 lease = scheduler.lease(self._graph, execution_spec)
                 self._graph.transition(task_id, TaskStatus.RUNNING)

@@ -18,6 +18,9 @@ class EvoWeaveConfig(DomainModel):
     max_worker_seconds: int = Field(default=900, ge=1, le=86_400)
     max_dynamic_tasks: int = Field(default=8, ge=1, le=128)
     split_directory_lines: int = Field(default=400, ge=1, le=1_000_000)
+    # 借鉴 dsh 可续接子代理: 失败 Worker 带上下文续接重试(默认关闭,
+    # 保持既有实验行为; 开启后失败任务复用上一执行规格派生下一版本)。
+    worker_continuation: bool = False
 
     @field_validator("runtime_directory")
     @classmethod
