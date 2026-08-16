@@ -1,0 +1,1 @@
+{"argv":["python","-m","ruff","check","."],"attempt":1,"command_id":"spec_daf830decf524ec4a96361fea7f9d6a2","duration_ms":141,"exit_code":0,"name":"Ruff 门禁","output_truncated":false,"phase":"baseline","scope":"lint","stderr":"","stdout":"All checks passed!\n","timed_out":false}

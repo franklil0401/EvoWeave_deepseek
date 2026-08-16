@@ -1,0 +1,58 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..c5362365d4f872ffc9bc29f0248f7ebd3fad905c 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -6,6 +6,7 @@ from __future__ import annotations
+ import base64
+ from dataclasses import dataclass
+ from pathlib import Path
++from typing import Callable
+ 
+ from app.config import Settings
+ 
+@@ -60,13 +61,36 @@ class AudioTranscriber:
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
++            return self._transcribe_with_retry(
++                self._transcribe_openai, Path(wav_path), provider
++            )
+         if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++            return self._transcribe_with_retry(
++                self._transcribe_doubao, Path(wav_path), provider
++            )
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_with_retry(
++        self,
++        transcribe_func: Callable[[Path], TranscriptionResult],
++        wav_path: Path,
++        provider: str,
++    ) -> TranscriptionResult:
++        """云端转写：网络或服务异常时自动重试一次，仍失败则回退并返回结构化结果。"""
++        last_error: Exception | None = None
++        for _attempt in range(2):  # 首次调用 + 失败后自动重试一次
++            try:
++                return transcribe_func(wav_path)
++            except Exception as exc:  # 网络/服务异常等，统一捕获以触发重试
++                last_error = exc
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"{provider} 转写在重试一次后仍失败：{last_error}",
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -130,4 +154,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

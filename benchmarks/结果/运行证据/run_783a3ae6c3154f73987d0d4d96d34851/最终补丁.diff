@@ -1,0 +1,49 @@
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..0f0f346be6293468d929fc1de214da213fda1398 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -55,19 +55,27 @@ class TranscriptStore:
+                 line = line.strip()
+                 if not line:
+                     continue
+-                raw = json.loads(line)
+-                if source is not None and raw.get("source") != source:
++                try:
++                    raw = json.loads(line)
++                    if not isinstance(raw, dict):
++                        # Skip lines that parse to a non-object (corrupted record).
++                        continue
++                    if source is not None and raw.get("source") != source:
++                        continue
++                    yield TranscriptRecord(
++                        id=str(raw["id"]),
++                        source=str(raw["source"]),
++                        text=str(raw["text"]),
++                        created_at=str(raw["created_at"]),
++                    )
++                except (json.JSONDecodeError, KeyError, TypeError, ValueError, AttributeError):
++                    # Skip corrupted or unparsable lines instead of
++                    # aborting the whole read; valid records are preserved.
+                     continue
+-                yield TranscriptRecord(
+-                    id=str(raw["id"]),
+-                    source=str(raw["source"]),
+-                    text=str(raw["text"]),
+-                    created_at=str(raw["created_at"]),
+-                )
+ 
+     def recent(self, limit: int = 5) -> list[TranscriptRecord]:
+         rows = list(self.iter_records())
+-        return rows[-max(0, limit) :]
++        return rows[-max(0, limit):]
+ 
+     def count(self) -> int:
+         return sum(1 for _ in self.iter_records())
+@@ -75,5 +83,4 @@ class TranscriptStore:
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file

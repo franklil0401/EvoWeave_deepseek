@@ -1,0 +1,116 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..2c95cd564edb2e2c591bec41505954b05c596fd9 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -29,7 +29,10 @@ class CourseRAGPipeline:
+     def save_student_question(self, question: str) -> TranscriptRecord | None:
+         return self.store.append(question, source="student")
+ 
+-    def _index_record(self, record: TranscriptRecord) -> None:
++    def _index_record(
++        self, record: TranscriptRecord, index: LocalVectorIndex | None = None
++    ) -> None:
++        index = index or self.index
+         chunks = chunk_text(
+             record.text,
+             max_chars=self.settings.chunk_max_chars,
+@@ -39,20 +42,29 @@ class CourseRAGPipeline:
+             {
+                 "record_id": record.id,
+                 "source": record.source,
+-                "chunk_index": index,
++                "chunk_index": chunk_idx,
+                 "created_at": record.created_at,
+             }
+-            for index, _ in enumerate(chunks)
++            for chunk_idx, _ in enumerate(chunks)
+         ]
+-        self.index.add(chunks, metas)
++        index.add(chunks, metas)
+ 
+     def rebuild_index(self) -> int:
+-        self.index.clear()
++        """Rebuild the index without touching the live one until success.
++
++        A brand-new index is built in memory from the transcript store. The
++        current index (both in memory and on disk) stays untouched while the
++        rebuild runs; only after every record has been indexed successfully is
++        it swapped in and persisted atomically. Any failure along the way
++        leaves the previous index fully usable.
++        """
++        rebuilt = LocalVectorIndex(self.settings.index_path)
+         count = 0
+         for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
++            before = len(rebuilt.documents)
++            self._index_record(record, rebuilt)
++            count += len(rebuilt.documents) - before
++        self.index.documents = rebuilt.documents
+         self.index.save()
+         return count
+ 
+@@ -76,4 +88,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..18ebce73ed795804dfa36587afdec06060e1093f 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,8 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
++import tempfile
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +92,32 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Atomically persist the index via a temp file + os.replace.
++
++        The payload is first written to a unique temporary file inside the
++        index directory, flushed and fsynced, then swapped into place with
++        ``os.replace``. A reader either observes the complete old index or the
++        complete new index, and a failed write never corrupts an existing one.
++        """
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
+-            json.dump(payload, file, ensure_ascii=False, indent=2)
++        self.path.parent.mkdir(parents=True, exist_ok=True)
++        fd, tmp_path = tempfile.mkstemp(
++            dir=self.path.parent,
++            prefix=self.path.name + ".",
++            suffix=".tmp",
++        )
++        try:
++            with os.fdopen(fd, "w", encoding="utf-8") as file:
++                json.dump(payload, file, ensure_ascii=False, indent=2)
++                file.flush()
++                os.fsync(file.fileno())
++            os.replace(tmp_path, self.path)
++        except BaseException:
++            try:
++                os.unlink(tmp_path)
++            except OSError:
++                pass
++            raise
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -125,5 +150,4 @@ class LocalVectorIndex:
+     def clear(self) -> None:
+         self.documents = []
+         if self.path.exists():
+-            self.path.unlink()
+-
++            self.path.unlink()
+\ No newline at end of file

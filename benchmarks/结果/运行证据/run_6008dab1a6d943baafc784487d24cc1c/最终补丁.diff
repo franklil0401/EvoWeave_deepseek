@@ -1,0 +1,98 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..0613e25e372dbd4c2608173d931f47caced324c7 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -29,7 +29,10 @@ class CourseRAGPipeline:
+     def save_student_question(self, question: str) -> TranscriptRecord | None:
+         return self.store.append(question, source="student")
+ 
+-    def _index_record(self, record: TranscriptRecord) -> None:
++    def _index_record(
++        self, record: TranscriptRecord, index: LocalVectorIndex | None = None
++    ) -> None:
++        index = index or self.index
+         chunks = chunk_text(
+             record.text,
+             max_chars=self.settings.chunk_max_chars,
+@@ -39,20 +42,28 @@ class CourseRAGPipeline:
+             {
+                 "record_id": record.id,
+                 "source": record.source,
+-                "chunk_index": index,
++                "chunk_index": chunk_index,
+                 "created_at": record.created_at,
+             }
+-            for index, _ in enumerate(chunks)
++            for chunk_index, _ in enumerate(chunks)
+         ]
+-        self.index.add(chunks, metas)
++        index.add(chunks, metas)
+ 
+     def rebuild_index(self) -> int:
+-        self.index.clear()
++        """Rebuild the index without breaking the currently usable one.
++
++        A brand new index is populated from the transcript store first. Only
++        after the full rebuild succeeds is the in-memory index swapped and
++        persisted atomically. If any step raises, the existing index remains
++        intact and usable.
++        """
++        new_index = LocalVectorIndex(self.settings.index_path)
+         count = 0
+         for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
++            before = len(new_index.documents)
++            self._index_record(record, new_index)
++            count += len(new_index.documents) - before
++        self.index.documents = new_index.documents
+         self.index.save()
+         return count
+ 
+@@ -76,4 +87,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..6e4799fcc837724b455a7017abb7b5c2599f9cbd 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +91,17 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Persist the index atomically via a temp file and os.replace.
++
++        The payload is written to a temporary sibling file first, then swapped
++        into place with os.replace. If writing fails, the original index file
++        is left untouched.
++        """
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
++        temp_path = self.path.with_name(self.path.name + ".tmp")
++        with temp_path.open("w", encoding="utf-8") as file:
+             json.dump(payload, file, ensure_ascii=False, indent=2)
++        os.replace(temp_path, self.path)
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -125,5 +134,4 @@ class LocalVectorIndex:
+     def clear(self) -> None:
+         self.documents = []
+         if self.path.exists():
+-            self.path.unlink()
+-
++            self.path.unlink()
+\ No newline at end of file

@@ -1,0 +1,110 @@
+[
+  {
+    "agent_id": "agent_3b000e3f086c433f92cc330448020449",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "created_at": "2026-08-15T13:16:17.173491Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18",
+        "size_bytes": 1544,
+        "storage_key": "sha256/16/1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18"
+      },
+      {
+        "artifact_id": "artifact_08613741ccce4befbf01122506303534",
+        "created_at": "2026-08-15T16:14:01.740745Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "025067227b87cb0ae540a74d2557a3ce435b3ee6ec152bbfa61adcdd819c1fb0",
+        "size_bytes": 940,
+        "storage_key": "sha256/02/025067227b87cb0ae540a74d2557a3ce435b3ee6ec152bbfa61adcdd819c1fb0"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_8f0a2996013d4a7388ce60bfbc2bf928",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_749389ec19e64c69a96c595d2dee94c1",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "command": null,
+        "evidence_id": "evidence_a6774fcbd8fc47cb90dc4cf2122e181a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_08613741ccce4befbf01122506303534",
+        "command": null,
+        "evidence_id": "evidence_81d685a18637481fb1261c9e4cfbadfe",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_2f587e308dda4090bbf85275a0b831a6",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_543e32f30e5440b2a0e2bfbcdd19eca9",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_2fe34c8160aa4a67b95ba96b67df646b",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "任务已完成。\n\n修改内容（仅限授权范围 app/config.py 与 app/transcriber.py）：\n\n1. **app/config.py**\n   - Settings 新增字段 `doubao_transcribe_prompt: str = DEFAULT_TRANSCRIBE_PROMPT`。\n   - `from_env` 中读取环境变量 `TA_DOUBAO_TRANSCRIBE_PROMPT`，未设置时回退到 `DEFAULT_TRANSCRIBE_PROMPT`，并执行 `.strip()` 清理。\n\n2. **app/transcriber.py**\n   - 从 `app.config` 导入 `DEFAULT_TRANSCRIBE_PROMPT`。\n   - `_transcribe_doubao` 豆包分支中，将原先硬编码的中文提示词替换为 `self.settings.doubao_transcribe_prompt or DEFAULT_TRANSCRIBE_PROMPT`，即优先使用配置的豆包转写提示词，空值时回退默认提示词。\n\n验收条件核对：\n- ✅ Settings 提供豆包转写提示词字段（`doubao_transcribe_prompt`）。\n- ✅ `from_env` 读取 `TA_DOUBAO_TRANSCRIBE_PROMPT`（未设置时使用 `DEFAULT_TRANSCRIBE_PROMPT`）。\n- ✅ transcriber 豆包分支使用配置的提示词。",
+    "task_id": "task_48976086c6e74c87902205b405c677c8",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 40343,
+      "input_tokens": 133111,
+      "output_tokens": 7518,
+      "reasoning_tokens": 2660,
+      "steps": 5,
+      "tool_calls": 7
+    }
+  }
+]

@@ -1,0 +1,63 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..8d2a1ac7af2c2b4e55b1bbfaf5dbfe44f31a1019 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -18,6 +18,9 @@ class TranscriptionResult:
+ 
+ 
+ class AudioTranscriber:
++    # 云端转写最大尝试次数：首次尝试 + 1 次自动重试
++    _MAX_ATTEMPTS = 2
++
+     def __init__(self, settings: Settings | None = None) -> None:
+         self.settings = settings or Settings.from_env()
+ 
+@@ -60,13 +63,39 @@ class AudioTranscriber:
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
++            return self._transcribe_with_retry(
++                lambda: self._transcribe_openai(Path(wav_path)), provider
++            )
+         if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++            return self._transcribe_with_retry(
++                lambda: self._transcribe_doubao(Path(wav_path)), provider
++            )
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_with_retry(self, attempt, provider: str) -> TranscriptionResult:
++        """云端转写异常时自动重试一次；重试仍失败则回退并返回结构化结果。
++
++        - 首次调用抛出的网络/服务异常不会立即向上传播，而是自动重试一次。
++        - 重试再次失败时不再抛出，而是返回 ``TranscriptionResult``（空文本 + warning），
++          让上层即使遭遇一次网络抖动也能拿到结构化结果，而不是中断整段课堂转写。
++        """
++        last_error: Exception | None = None
++        for attempt_index in range(self._MAX_ATTEMPTS):
++            try:
++                return attempt()
++            except Exception as exc:  # 网络/服务异常统一重试
++                last_error = exc
++                if attempt_index + 1 < self._MAX_ATTEMPTS:
++                    # 首次失败，进入自动重试
++                    continue
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=f"{provider} 转写重试后仍失败，已回退：{last_error}",
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+             raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+@@ -130,4 +159,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

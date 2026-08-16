@@ -1,0 +1,44 @@
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..57491c35061476949361bd41ab906def799e2c94 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -55,15 +55,24 @@ class TranscriptStore:
+                 line = line.strip()
+                 if not line:
+                     continue
+-                raw = json.loads(line)
++                try:
++                    raw = json.loads(line)
++                except (json.JSONDecodeError, ValueError):
++                    # Skip corrupted / unparseable lines instead of aborting the
++                    # whole read so that subsequent valid records still load.
++                    continue
+                 if source is not None and raw.get("source") != source:
+                     continue
+-                yield TranscriptRecord(
+-                    id=str(raw["id"]),
+-                    source=str(raw["source"]),
+-                    text=str(raw["text"]),
+-                    created_at=str(raw["created_at"]),
+-                )
++                try:
++                    yield TranscriptRecord(
++                        id=str(raw["id"]),
++                        source=str(raw["source"]),
++                        text=str(raw["text"]),
++                        created_at=str(raw["created_at"]),
++                    )
++                except (KeyError, TypeError):
++                    # Skip records with missing/malformed fields.
++                    continue
+ 
+     def recent(self, limit: int = 5) -> list[TranscriptRecord]:
+         rows = list(self.iter_records())
+@@ -75,5 +84,4 @@ class TranscriptStore:
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file

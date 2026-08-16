@@ -1,0 +1,174 @@
+[
+  {
+    "agent_id": "agent_6d7b49649c9d4185b46da37b69b3f6d3",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_c93cba8a1bf546298094c3b8dc33470c",
+        "created_at": "2026-08-16T15:16:39.175226Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "5a5ebfad5a0af116775d72451ba3d2eb689749f32e7e3fc670134353631ab430",
+        "size_bytes": 763,
+        "storage_key": "sha256/5a/5a5ebfad5a0af116775d72451ba3d2eb689749f32e7e3fc670134353631ab430"
+      },
+      {
+        "artifact_id": "artifact_45994a49f496440996df73e320e88d7b",
+        "created_at": "2026-08-16T15:16:43.574625Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "eaa623c4b01570de1de62a476506cca5fedb72911ce8bdf2ec2275d5dd15cc5f",
+        "size_bytes": 567,
+        "storage_key": "sha256/ea/eaa623c4b01570de1de62a476506cca5fedb72911ce8bdf2ec2275d5dd15cc5f"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_17bde53989484854b8ea5d83e0a1fc6a",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_c93cba8a1bf546298094c3b8dc33470c",
+        "command": null,
+        "evidence_id": "evidence_40973f6d50d7488e9efbe14efe38e735",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_45994a49f496440996df73e320e88d7b",
+        "command": null,
+        "evidence_id": "evidence_08e44d15f7734347b2d7baea0c99bea1",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_72c02573638a4d308ae33f6847a86aee",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_daedce4388294cf191466a5a88f7d387",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_f3cea8b6b0804d77bb4be644ab372a4c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_220dcdc54c5c4cfbb9aaab4b4a22ba2b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_8fba7de379f545799b8ed275b98cb9ff",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_f1fc8124fe0648fa8cfa5a9869cc5b3e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0079cae003dc47de9a3691a1186cd2ab",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_c785875792344e6eabf58de33242164f",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_217f18d34fc64323828558dad1d12092",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已完成课堂记录文件损坏容错。在 rag/transcript_store.py 的 TranscriptStore.iter_records 中，将 json.loads(line) 包裹在 try/except 里，捕获 JSONDecodeError/ValueError 后跳过损坏行并 continue，继续读取后续有效记录。验收条件满足：损坏行被跳过，后续有效记录仍可读取。",
+    "task_id": "task_d7cbe408af974f3d8b727790f7aa045a",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 59875,
+      "input_tokens": 461896,
+      "output_tokens": 6833,
+      "reasoning_tokens": 2009,
+      "steps": 19,
+      "tool_calls": 18
+    }
+  }
+]

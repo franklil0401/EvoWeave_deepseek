@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "validation_failed",
+  "message": "chunk_text() 默认参数不符合验收条件：当前默认为 max_chars=420、overlap=60，要求默认 max_chars=800、overlap=120。测试未对默认值做断言，无法覆盖该缺陷；仅 config/文档层面为 800/120。本步骤只读，无法修复。"
+}

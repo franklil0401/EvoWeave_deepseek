@@ -1,0 +1,550 @@
+[
+  {
+    "agent_id": "agent_829b5d18712d4ccf97b8582826c817b0",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_a14a8205414e42b6b452e2bd8bee7bf1",
+        "created_at": "2026-08-15T12:58:35.456458Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "fa3ff09004ff82d6e65d9b6af9ca22bb01a91c180c5943257d002f78a4ec7b00",
+        "size_bytes": 1340,
+        "storage_key": "sha256/fa/fa3ff09004ff82d6e65d9b6af9ca22bb01a91c180c5943257d002f78a4ec7b00"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_b4795b1a4cbc4aab8946689bc83df718",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_be33cd08f2a04df3985e0474be2f5098",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_5c4193eab507421fa24318b66ac86f72",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0d3afc8118ad4bb0b59cfb327e618d4b",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e0e6aac5b4c64fb1acb0f841e2a6306b",
+        "kind": "file",
+        "line_end": 133,
+        "line_start": 133,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:133 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_a14a8205414e42b6b452e2bd8bee7bf1",
+        "command": null,
+        "evidence_id": "evidence_9ec3d4169d0844bc8e074c86a61ab17d",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6522739ca7004233984f4439bd1b3f03",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": ".env.example",
+        "summary": "已读取 .env.example",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_10c2140ebb0a4532b460dd3263ab979c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_97d020d837d042ee8fb7a346592ec8e7",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_d9f504026dda4ee39e70d8357490e3f9",
+        "kind": "file",
+        "line_end": 205,
+        "line_start": 205,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:205 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_956f386b509b472b801cffcf1ea61aef",
+        "kind": "file",
+        "line_end": 206,
+        "line_start": 206,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:206 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_4859071660204981b54f9627689540de",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_cc5d1a0e3c374838bebb13e6746125c5",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0d2bfa29232849738fc5a68cfa0a47ab",
+        "kind": "file",
+        "line_end": 97,
+        "line_start": 97,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:97 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0706dd959a1c473f9a201da1e9d40723",
+        "kind": "file",
+        "line_end": 205,
+        "line_start": 205,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:205 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_043065e465c745b58f6713f39881e21f",
+        "kind": "file",
+        "line_end": 98,
+        "line_start": 98,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:98 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_941d1a03a7894d5d885f3978668c424e",
+        "kind": "file",
+        "line_end": 206,
+        "line_start": 206,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:206 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_1556e0b2d51f4dad9d278e4597e45215",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6124c6dbc7544b3c915f838d9e8b6b92",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e5655f0ab6fe45deaa9cd10d357b7c7e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_404072f7f6b64232a1c70c304c238fcf",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "app/config.py 已完成参数化：Settings 新增 audio_merge_min_chars 字段（默认 80，从环境变量 TA_MIN_CHARS 读取）和 audio_merge_flush_seconds 字段（默认 5.0，从环境变量 TA_FLUSH_SECONDS 读取），并已在 from_env() 中接入对应环境变量读取逻辑。写范围（app/config.py）验收条件已满足。",
+    "task_id": "task_6b179f1cc0384d3290d9562831f3c224",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 317092,
+      "input_tokens": 859447,
+      "output_tokens": 48981,
+      "reasoning_tokens": 35956,
+      "steps": 22,
+      "tool_calls": 25
+    }
+  },
+  {
+    "agent_id": "agent_e11c32a54fb5478a830bb612d62bafc2",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_5e68d92c3d4b4251bed9d8ea4c357306",
+        "created_at": "2026-08-16T15:15:26.183585Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "cf755bb031802f8c19ebd954abc7fc028769bb7fb9f0d45675f7fa71bbb1cb86",
+        "size_bytes": 1357,
+        "storage_key": "sha256/cf/cf755bb031802f8c19ebd954abc7fc028769bb7fb9f0d45675f7fa71bbb1cb86"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_99e9cfa93fdd4367b159ef10066b8c17",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_4234cbf5f63a416389e4e8cc93788c8b",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_53108939af0449a79a186c3c02b5eb20",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0f38debc32dd400cbec60cd61550a05f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": ".env.example",
+        "summary": "已读取 .env.example",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_1ef74e6ad48146a3a5c20036274d30a7",
+        "kind": "file",
+        "line_end": 24,
+        "line_start": 24,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:24 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_02619a59ba934a488244a824a7f30b28",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0819d960fa024b0eac89121cba525284",
+        "kind": "file",
+        "line_end": 26,
+        "line_start": 26,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:26 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9ec88625b46e42f4b26f8f7acf79b5b9",
+        "kind": "file",
+        "line_end": 127,
+        "line_start": 127,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:127 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_f59b20c05b95408d852f949b5ed339c8",
+        "kind": "file",
+        "line_end": 133,
+        "line_start": 133,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:133 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_58a5f4a18676442db74f461068cf13a6",
+        "kind": "file",
+        "line_end": 18,
+        "line_start": 18,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:18 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e5fcf657ccd94eb692c341190a806de0",
+        "kind": "file",
+        "line_end": 103,
+        "line_start": 103,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:103 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_cf455032c3f04809a9ab09c79b18b64b",
+        "kind": "file",
+        "line_end": 104,
+        "line_start": 104,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:104 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_8c18be786ef64d819af2b53a94d02fe6",
+        "kind": "file",
+        "line_end": 115,
+        "line_start": 115,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:115 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_8bf0e6d2863f4ac7baffd28f3855f9b4",
+        "kind": "file",
+        "line_end": 116,
+        "line_start": 116,
+        "repository_path": "app/config.py",
+        "summary": "在 app/config.py:116 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_5e68d92c3d4b4251bed9d8ea4c357306",
+        "command": null,
+        "evidence_id": "evidence_ff33483c87df477aaee6a47025c1f5ed",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/audio_listener.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_494912568dca4bd4ab1b42fbcf52ccd4",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_dc19565a14744200b0f75e1c50ec9695",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_4d9215558f7a46b6ba1f2d0ee6ee16c3",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_ea75bcd61c4d426ca2e97cc9057c5a43",
+        "kind": "file",
+        "line_end": 26,
+        "line_start": 26,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:26 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e8edb2964dbe48efa08e2e83d37d347c",
+        "kind": "file",
+        "line_end": 127,
+        "line_start": 127,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:127 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_a212ad2d47d94777b425aefb73cf9c2a",
+        "kind": "file",
+        "line_end": 133,
+        "line_start": 133,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:133 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_a3407e1a5a2d4e969ba7f0d212906247",
+        "kind": "file",
+        "line_end": 25,
+        "line_start": 25,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:25 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9dcf18a4b1a44c0785e1b5c8af58a030",
+        "kind": "file",
+        "line_end": 26,
+        "line_start": 26,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:26 找到匹配",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_18becd944a404ef58deaf8523fa83016",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已将 app/audio_listener.py 中音频转写短句合并阈值与强制入库超时参数化：合并阈值从 TA_MIN_CHARS 环境变量读取（默认 80，替换原硬编码 500 常量 _MERGE_MAX_CHARS），强制入库超时从 TA_FLUSH_SECONDS 读取（默认 5.0）。已验证 '500' 与 '_MERGE_MAX_CHARS' 均不再出现在文件中，两个环境变量均已正确接入，验收条件全部满足。",
+    "task_id": "task_15bbb2c28f1f4a56aef256279db02698",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 143827,
+      "input_tokens": 640725,
+      "output_tokens": 23148,
+      "reasoning_tokens": 13035,
+      "steps": 14,
+      "tool_calls": 17
+    }
+  }
+]

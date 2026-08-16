@@ -1,0 +1,102 @@
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..ba3c0dc47476717e750f19b8db99c0a54a7a2959 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -22,14 +22,14 @@ class CourseRAGPipeline:
+         record = self.store.append(text, source="teacher")
+         if record is None:
+             return None
+-        self._index_record(record)
++        self._index_record(record, self.index)
+         self.index.save()
+         return record
+ 
+     def save_student_question(self, question: str) -> TranscriptRecord | None:
+         return self.store.append(question, source="student")
+ 
+-    def _index_record(self, record: TranscriptRecord) -> None:
++    def _index_record(self, record: TranscriptRecord, index: LocalVectorIndex) -> None:
+         chunks = chunk_text(
+             record.text,
+             max_chars=self.settings.chunk_max_chars,
+@@ -44,16 +44,24 @@ class CourseRAGPipeline:
+             }
+             for index, _ in enumerate(chunks)
+         ]
+-        self.index.add(chunks, metas)
++        index.add(chunks, metas)
+ 
+     def rebuild_index(self) -> int:
+-        self.index.clear()
++        # Build a fresh index in memory. Only on success do we persist it
++        # atomically and swap it in, so a failed rebuild never corrupts the
++        # existing index that queries are still served from.
++        new_index = LocalVectorIndex(self.settings.index_path)
+         count = 0
+-        for record in self.store.iter_records(source="teacher"):
+-            before = len(self.index.documents)
+-            self._index_record(record)
+-            count += len(self.index.documents) - before
+-        self.index.save()
++        try:
++            for record in self.store.iter_records(source="teacher"):
++                before = len(new_index.documents)
++                self._index_record(record, new_index)
++                count += len(new_index.documents) - before
++        except Exception:
++            # Leave the current in-memory index and the on-disk index untouched.
++            raise
++        new_index.save()
++        self.index = new_index
+         return count
+ 
+     def retrieve(self, question: str, top_k: int | None = None) -> list[dict[str, Any]]:
+@@ -76,4 +84,4 @@ class CourseRAGPipeline:
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/vector_index.py b/rag/vector_index.py
+index a4dd17ac60865196c44cff18ee3b92f9a9dbb092..d70bffea9a07cd4b5ae43e45408d473047208f56 100644
+--- a/rag/vector_index.py
++++ b/rag/vector_index.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ 
+ import json
+ import math
++import os
+ from collections import Counter
+ from dataclasses import dataclass
+ from pathlib import Path
+@@ -90,9 +91,20 @@ class LocalVectorIndex:
+         self.documents = list(raw.get("documents", []))
+ 
+     def save(self) -> None:
++        """Persist the index atomically.
++
++        The payload is written to a temporary file in the same directory and
++        then moved over the target path with ``os.replace``. This guarantees a
++        reader either sees the complete previous index or the complete new one,
++        never a partially written file.
++        """
+         payload = {"documents": self.documents}
+-        with self.path.open("w", encoding="utf-8") as file:
++        tmp_path = self.path.with_name(f"{self.path.name}.tmp")
++        with tmp_path.open("w", encoding="utf-8") as file:
+             json.dump(payload, file, ensure_ascii=False, indent=2)
++            file.flush()
++            os.fsync(file.fileno())
++        os.replace(tmp_path, self.path)
+ 
+     def add(self, texts: list[str], metas: list[dict[str, Any]]) -> None:
+         for text, meta in zip(texts, metas):
+@@ -125,5 +137,4 @@ class LocalVectorIndex:
+     def clear(self) -> None:
+         self.documents = []
+         if self.path.exists():
+-            self.path.unlink()
+-
++            self.path.unlink()
+\ No newline at end of file

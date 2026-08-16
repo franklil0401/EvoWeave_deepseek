@@ -1,0 +1,109 @@
+diff --git a/app/transcriber.py b/app/transcriber.py
+index 72f4b43ae7e1de2a1e53ac1b609de175e37beb65..1409536cb0c17d8e59e57366f8b9cb0af1d4200b 100644
+--- a/app/transcriber.py
++++ b/app/transcriber.py
+@@ -4,6 +4,7 @@
+ from __future__ import annotations
+ 
+ import base64
++from collections.abc import Callable
+ from dataclasses import dataclass
+ from pathlib import Path
+ 
+@@ -17,7 +18,14 @@ class TranscriptionResult:
+     warning: str = ""
+ 
+ 
++class TranscriberConfigError(RuntimeError):
++    """缺少密钥/依赖等本地配置错误：不属于网络/服务异常，无法通过重试恢复，直接抛出。"""
++
++
+ class AudioTranscriber:
++    # 云端转写遇到网络/服务异常时最多额外重试的次数（即转写失败自动重试一次）
++    _MAX_TRANSCRIBE_RETRIES = 1
++
+     def __init__(self, settings: Settings | None = None) -> None:
+         self.settings = settings or Settings.from_env()
+ 
+@@ -60,21 +68,55 @@ class AudioTranscriber:
+     def transcribe_wav(self, wav_path: str | Path) -> TranscriptionResult:
+         provider = self.provider
+         if provider == "openai":
+-            return self._transcribe_openai(Path(wav_path))
++            return self._transcribe_with_retry(
++                provider,
++                lambda: self._transcribe_openai(Path(wav_path)),
++            )
+         if provider == "doubao":
+-            return self._transcribe_doubao(Path(wav_path))
++            return self._transcribe_with_retry(
++                provider,
++                lambda: self._transcribe_doubao(Path(wav_path)),
++            )
+         if provider == "doubao_streaming":
+             raise RuntimeError("豆包流式 ASR 需要直接接收实时 PCM 音频，不能使用 WAV 片段转写。")
+         raise RuntimeError(f"不支持的云端转写提供方：{provider}")
+ 
++    def _transcribe_with_retry(
++        self,
++        provider: str,
++        attempt: Callable[[], TranscriptionResult],
++    ) -> TranscriptionResult:
++        """云端转写入口：网络/服务异常时自动重试一次，重试仍失败则回退为结构化失败结果。
++
++        本地配置错误（缺少密钥/依赖）不属于可恢复异常，直接抛出、不参与重试。
++        """
++        errors: list[Exception] = []
++        for _ in range(self._MAX_TRANSCRIBE_RETRIES + 1):
++            try:
++                return attempt()
++            except TranscriberConfigError:
++                raise
++            except Exception as exc:
++                errors.append(exc)
++
++        last_error = errors[-1] if errors else Exception("未知转写错误")
++        return TranscriptionResult(
++            text="",
++            provider=provider,
++            warning=(
++                f"{provider} 转写失败，已自动重试 {self._MAX_TRANSCRIBE_RETRIES} 次仍失败，"
++                f"本次课堂片段已跳过。错误详情：{last_error}"
++            ),
++        )
++
+     def _transcribe_openai(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.openai_api_key:
+-            raise RuntimeError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
++            raise TranscriberConfigError("缺少 OPENAI_API_KEY，无法使用 OpenAI 音频转写。")
+ 
+         try:
+             from openai import OpenAI
+         except Exception as exc:
+-            raise RuntimeError("缺少 openai 依赖，请先执行：pip install openai") from exc
++            raise TranscriberConfigError("缺少 openai 依赖，请先执行：pip install openai") from exc
+ 
+         kwargs = {"api_key": self.settings.openai_api_key}
+         if self.settings.openai_base_url:
+@@ -94,12 +136,12 @@ class AudioTranscriber:
+ 
+     def _transcribe_doubao(self, wav_path: Path) -> TranscriptionResult:
+         if not self.settings.ark_api_key:
+-            raise RuntimeError("缺少 ARK_API_KEY，无法使用豆包音频转写。")
++            raise TranscriberConfigError("缺少 ARK_API_KEY，无法使用豆包音频转写。")
+ 
+         try:
+             from openai import OpenAI
+         except Exception as exc:
+-            raise RuntimeError("缺少 openai 依赖，请先执行：pip install openai") from exc
++            raise TranscriberConfigError("缺少 openai 依赖，请先执行：pip install openai") from exc
+ 
+         client = OpenAI(
+             api_key=self.settings.ark_api_key,
+@@ -130,4 +172,4 @@ class AudioTranscriber:
+         return TranscriptionResult(
+             text=response.choices[0].message.content.strip(),
+             provider="doubao",
+-        )
++        )
+\ No newline at end of file

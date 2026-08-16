@@ -1,0 +1,218 @@
+[
+  {
+    "agent_id": "agent_3e1d2896735b4079a0179b34d0ca1284",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_fbb28c67422d4aefa59bcdaa874f64e0",
+        "created_at": "2026-08-16T15:23:42.078655Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "5b7ab1801a5e9e60937fef258cefe2b1c1c722eb32b5dfa19fd92fe2f495777c",
+        "size_bytes": 1018,
+        "storage_key": "sha256/5b/5b7ab1801a5e9e60937fef258cefe2b1c1c722eb32b5dfa19fd92fe2f495777c"
+      },
+      {
+        "artifact_id": "artifact_b406c00a534e41e3a3c8a0572dbabfb5",
+        "created_at": "2026-08-16T15:23:42.454290Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "f48c2b5ffef97b48adc2f97a642124878767151cdf61ee10aa1ccb865b07520e",
+        "size_bytes": 1774,
+        "storage_key": "sha256/f4/f48c2b5ffef97b48adc2f97a642124878767151cdf61ee10aa1ccb865b07520e"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_1a9739e3f59e4a9da925802b549ef8fa",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_b3616676ba0140c285cd27fa953c47d1",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e68890e8eabb403ebdfa42f1fc3bfc0d",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_57de8fbed8de4549a37f2eb63dbd9ae4",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_fbb28c67422d4aefa59bcdaa874f64e0",
+        "command": null,
+        "evidence_id": "evidence_cba8202d6bcb4e609035747a200ef0b9",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/vector_index.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_b406c00a534e41e3a3c8a0572dbabfb5",
+        "command": null,
+        "evidence_id": "evidence_2cfeae57b9234718bbfc44937a40d574",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/pipeline.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_a2c90ed1b5a042dea36c009018bd441f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_3e47d86696a24b04b4709db8e670f92c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9af9a8bc584c4481a29dde71306d2b5a",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9f92c212b3ef46c38a415544cf24c67f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_f22ac426397d491bb6a059c613d2ce04",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_7ded95301f7247a38823d5a5b788dcc4",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/vector_index.py",
+        "summary": "已读取 rag/vector_index.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_f70eba59eef64415b93e8b501e925ee6",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_cf4f03a211d94347b687fd201293eb41",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/vector_index.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_66f7f3af27534770a5c3a8f69971170a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/pipeline.py 的补丁",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_93886048b71a4e6080b4393524e55aea",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "完成索引重建原子化改造：LocalVectorIndex.save() 改为写临时文件后 os.replace 原子替换；CourseRAGPipeline.rebuild_index() 在全新内存索引上构建，成功后原子落盘并替换引用，重建失败时旧索引保持可用。改动仅涉及 rag/vector_index.py 与 rag/pipeline.py。",
+    "task_id": "task_967646163f714f62b799b2ece762d4f4",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 80390,
+      "input_tokens": 366160,
+      "output_tokens": 11535,
+      "reasoning_tokens": 4929,
+      "steps": 13,
+      "tool_calls": 19
+    }
+  }
+]

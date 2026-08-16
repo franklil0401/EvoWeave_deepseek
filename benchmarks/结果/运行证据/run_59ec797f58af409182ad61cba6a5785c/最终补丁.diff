@@ -1,0 +1,122 @@
+diff --git a/app/web_server.py b/app/web_server.py
+index bb9c8731dfeed2618ec99b896e03ea2811747a5d..a581fc426f37ef744ab3449bd574835b317b7f78 100644
+--- a/app/web_server.py
++++ b/app/web_server.py
+@@ -138,6 +138,15 @@ def create_app(settings: Settings | None = None) -> Flask:
+         bus.publish("status", {"message": "课堂历史已清空"})
+         return jsonify({"ok": True, "message": "本节课历史已清空"})
+ 
++    @app.post("/api/clear_qa")
++    def api_clear_qa():
++        cleared = pipeline.clear_student_questions()
++        return jsonify({
++            "ok": True,
++            "message": "对话区已清空",
++            "cleared": cleared,
++        })
++
+     @app.post("/api/ask")
+     def api_ask():
+         body = request.get_json(silent=True) or {}
+@@ -215,4 +224,4 @@ def create_app(settings: Settings | None = None) -> Flask:
+             "X-Accel-Buffering": "no",
+         })
+ 
+-    return app
++    return app
+\ No newline at end of file
+diff --git a/rag/pipeline.py b/rag/pipeline.py
+index faf3e83b915c4738a87770bc29453b5a9462ac7a..256dec7a010b1e7f8915a8ab87fef664d4be4926 100644
+--- a/rag/pipeline.py
++++ b/rag/pipeline.py
+@@ -73,7 +73,15 @@ class CourseRAGPipeline:
+     def recent_records(self, limit: int = 5) -> list[TranscriptRecord]:
+         return self.store.recent(limit)
+ 
++    def clear_student_questions(self) -> int:
++        """Clear only student question history.
++
++        Teacher transcripts and the retrieval index are left untouched.
++        Returns the number of student questions removed.
++        """
++        return self.store.clear_source("student")
++
+     def clear_history(self) -> None:
+         self.store.clear()
+         self.index.clear()
+-        self.index.save()
++        self.index.save()
+\ No newline at end of file
+diff --git a/rag/transcript_store.py b/rag/transcript_store.py
+index 81a0997a692a50e9bb5199334e46e8fd00a75d6a..5b3104666f3a6167965ee6635fdfd01170f777c9 100644
+--- a/rag/transcript_store.py
++++ b/rag/transcript_store.py
+@@ -72,8 +72,31 @@ class TranscriptStore:
+     def count(self) -> int:
+         return sum(1 for _ in self.iter_records())
+ 
++    def clear_source(self, source: str) -> int:
++        """Remove all records of the given source, returning how many were removed.
++
++        Records of other sources (e.g. teacher transcripts) are kept untouched.
++        """
++        if not self.path.is_file():
++            return 0
++        removed = 0
++        kept: list[str] = []
++        with self.path.open("r", encoding="utf-8") as file:
++            for line in file:
++                line = line.strip()
++                if not line:
++                    continue
++                raw = json.loads(line)
++                if raw.get("source") == source:
++                    removed += 1
++                    continue
++                kept.append(line)
++        with self.path.open("w", encoding="utf-8") as file:
++            for line in kept:
++                file.write(line + "\n")
++        return removed
++
+     def clear(self) -> None:
+         if self.path.exists():
+             self.path.unlink()
+-        self.path.touch()
+-
++        self.path.touch()
+\ No newline at end of file
+diff --git a/static/index.html b/static/index.html
+index 5baeba3c0fbdddc70fdff3b15bdfdbde3257e21d..440ac19e9310d2a07a6982942fc8191d70279a7a 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -488,9 +488,19 @@ async function doClear() {
+   addStatusMsg(res.message);
+ }
+ 
+-// ── clear QA ──
+-function doClearQA() {
+-  document.getElementById('qaBody').innerHTML = '';
++// ── clear QA (only the Q&A dialogue, classroom records are kept) ──
++async function doClearQA() {
++  if (!confirm('确定清空当前对话区吗？课堂记录与检索索引不会受影响。')) return;
++  try {
++    const res = await api('/api/clear_qa');
++    if (res.ok) {
++      document.getElementById('qaBody').innerHTML = '';
++    } else {
++      alert(res.message || '清空对话失败');
++    }
++  } catch (e) {
++    alert('清空对话失败：' + (e.message || e));
++  }
+ }
+ 
+ // ── source ──
+@@ -611,4 +621,4 @@ async function init() {
+ init();
+ </script>
+ </body>
+-</html>
++</html>
+\ No newline at end of file

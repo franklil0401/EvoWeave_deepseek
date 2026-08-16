@@ -1,0 +1,90 @@
+[
+  {
+    "agent_id": "agent_02aee414ffec4c44b719539e55738d91",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_3c4d5bb6393b4f15a9646a35975ffaec",
+        "created_at": "2026-08-16T11:58:37.260596Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "2a1e672368f9c425a4bdfc7c28dd145fd6a68c9125dcd786f4d08021f0b98bee",
+        "size_bytes": 1542,
+        "storage_key": "sha256/2a/2a1e672368f9c425a4bdfc7c28dd145fd6a68c9125dcd786f4d08021f0b98bee"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_989a0fef7bda4fe9b1589d4f217435e4",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_3c4d5bb6393b4f15a9646a35975ffaec",
+        "command": null,
+        "evidence_id": "evidence_1e200fab52da4bdb8382b9372e6fdd5f",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_b7ae9a7b899d4c8f85e57695eb829a19",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_4edf5e63d2bf4ccba574012eeedbea24",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_8d7f9f1630824becae93f6217570e15f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_4350e92f2f0045b998639fe0d2df072d",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已完成 rag/transcript_store.py 的损坏容错改造。TranscriptStore.iter_records 现在将每行的 json.loads 解析和 TranscriptRecord 构造包在 try/except 中，捕获 json.JSONDecodeError、KeyError、TypeError、ValueError 后直接 continue 跳过损坏/无法解析的行，因此：1) 损坏行被跳过而不会中断整个读取；2) 损坏行之后的后续有效记录仍可正常 yield。其余逻辑（空行跳过、source 过滤、recent/count/clear 等）保持不变。验收条件均已满足。",
+    "task_id": "task_0deee33a89c0454d84884489fb687c7f",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 53171,
+      "input_tokens": 252397,
+      "output_tokens": 6719,
+      "reasoning_tokens": 4140,
+      "steps": 11,
+      "tool_calls": 10
+    }
+  }
+]

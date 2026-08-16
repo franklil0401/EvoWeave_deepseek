@@ -1,0 +1,132 @@
+[
+  {
+    "agent_id": "agent_56729751eec44b61b67d8dd318bd6796",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_be5e65743aac45868ba6af3e0fe16d42",
+        "created_at": "2026-08-15T13:21:01.496506Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "64244e2f4deeffca637380372523b2ffd4b7a70c118563253ca040f92ebc66f7",
+        "size_bytes": 646,
+        "storage_key": "sha256/64/64244e2f4deeffca637380372523b2ffd4b7a70c118563253ca040f92ebc66f7"
+      },
+      {
+        "artifact_id": "artifact_83ed220025a1412fb8741f09efdaee21",
+        "created_at": "2026-08-15T13:41:13.139807Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "fac7be4f3f3362c7a4d02ea0256fa55ac716ed2b13c649a5fdd46f4a9f0101a8",
+        "size_bytes": 586,
+        "storage_key": "sha256/fa/fac7be4f3f3362c7a4d02ea0256fa55ac716ed2b13c649a5fdd46f4a9f0101a8"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_7d4d41e4b87b438fa4ab9d90b8d1eb9a",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_6663e10f21f7487bab84a321d2a9df7e",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_be5e65743aac45868ba6af3e0fe16d42",
+        "command": null,
+        "evidence_id": "evidence_59ea536863a24388b4b2c990e25ab786",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/transcript_store.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_83ed220025a1412fb8741f09efdaee21",
+        "command": null,
+        "evidence_id": "evidence_47eeb7d132dd4d9684c4de49f821c14a",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 rag/pipeline.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_923249b1e5d943fa88a57239a0f4138c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_b3ed23c3a6914976b493312e4952d08f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_cba3c44d77e9467e90bdb9c80b39695f",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/transcript_store.py",
+        "summary": "已读取 rag/transcript_store.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_fc9e22892a0c4d19b84ae365056861ec",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "rag/pipeline.py",
+        "summary": "已读取 rag/pipeline.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_ffdc48ca81094e5b9bcd246d969cd681",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已为 TranscriptStore.recent 和 CourseRAGPipeline.recent_records 增加可选 source 参数，透传过滤；未提供 source 时默认 None，行为与原来一致。",
+    "task_id": "task_9dbc21012eb34c18bfc2540ee9684cfa",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 24344,
+      "input_tokens": 140069,
+      "output_tokens": 3222,
+      "reasoning_tokens": 955,
+      "steps": 6,
+      "tool_calls": 9
+    }
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "agent_id": "agent_552f9d96d3b343e0825d78d897e0c898",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "created_at": "2026-08-15T13:16:17.173491Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18",
+        "size_bytes": 1544,
+        "storage_key": "sha256/16/1620812d10b0018c344284b88fb5266262e6c61b9c7a47ae0ccfb10f8fdb8d18"
+      },
+      {
+        "artifact_id": "artifact_27d6e0a817bd43cb97a39f00249d1602",
+        "created_at": "2026-08-15T13:37:56.777130Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "b692f1ee635fba8eb161bd3dbb279a3e96495193272a1b1d6b7ac977826b141d",
+        "size_bytes": 610,
+        "storage_key": "sha256/b6/b692f1ee635fba8eb161bd3dbb279a3e96495193272a1b1d6b7ac977826b141d"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_c2ff66b31db644169f20185302857e74",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_ece9f61175104e4cb33f093e21fd3331",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_ec4d8dd7f5bb4bcbafbe68ec9915568a",
+        "command": null,
+        "evidence_id": "evidence_99f9aa54b0a047c599052b5236203716",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/config.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_27d6e0a817bd43cb97a39f00249d1602",
+        "command": null,
+        "evidence_id": "evidence_b8637eb897d24b12b454f9a994e23421",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_86266fd0fb0746458ec42dfa021a535c",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/config.py",
+        "summary": "已读取 app/config.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_4356a6dbd4d34decb73786bd2f567a62",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_6d11a0f991144562a017a943c044f921",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已完成豆包转写提示词可配置改造。\n\n1. app/config.py：Settings 新增 doubao_transcribe_prompt 字段，默认值为 DEFAULT_TRANSCRIBE_PROMPT；from_env 中通过 os.environ.get(\"TA_DOUBAO_TRANSCRIBE_PROMPT\", DEFAULT_TRANSCRIBE_PROMPT).strip() 读取环境变量，未设置时回退到默认提示词。\n2. app/transcriber.py：_transcribe_doubao 分支的 user 消息文本由硬编码的“请把这段课堂音频准确转写成中文文字，只输出转写结果。”改为使用 self.settings.doubao_transcribe_prompt。\n\n验收条件均已满足：Settings 提供豆包转写提示词字段、from_env 读取 TA_DOUBAO_TRANSCRIBE_PROMPT、transcriber 豆包分支使用配置的提示词。仅修改了授权的 app/config.py 与 app/transcriber.py 两个文件。",
+    "task_id": "task_cdaa1106fe714391946fd31656959d56",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 51218,
+      "input_tokens": 163357,
+      "output_tokens": 8820,
+      "reasoning_tokens": 3680,
+      "steps": 6,
+      "tool_calls": 8
+    }
+  }
+]

@@ -1,0 +1,98 @@
+diff --git a/app/audio_listener.py b/app/audio_listener.py
+index bb3e164d74c9398194ca53dcfe4892b9006b9290..366b9b4ed98703e3e1c4456cf252eda1a0fb647e 100644
+--- a/app/audio_listener.py
++++ b/app/audio_listener.py
+@@ -5,6 +5,7 @@ from __future__ import annotations
+ 
+ from collections import deque
+ import json
++import os
+ import queue
+ import tempfile
+ import threading
+@@ -20,11 +21,6 @@ from app.transcriber import AudioTranscriber
+ 
+ 
+ class AudioListener:
+-    # ── 短句合并参数 ──
+-    _MERGE_MIN_CHARS = 80       # 积累到 80 字以上才作为一条入库
+-    _MERGE_MAX_CHARS = 500      # 超过 500 字强制入库（避免太长）
+-    _MERGE_FLUSH_SECONDS = 5.0 # 超过 5 秒没新句子也强制入库
+-
+     def __init__(
+         self,
+         on_final_text: Callable[[str], None],
+@@ -41,6 +37,10 @@ class AudioListener:
+         self._last_partial_text = ""
+         self._last_partial_time = 0.0
+ 
++        # 短句合并参数：合并阈值 / 强制入库超时可由环境变量覆盖
++        self._merge_min_chars = int(os.environ.get("TA_MIN_CHARS", "80"))
++        self._merge_flush_seconds = float(os.environ.get("TA_FLUSH_SECONDS", "5.0"))
++
+         # 短句合并缓冲
+         self._merge_buffer: list[str] = []
+         self._merge_chars = 0
+@@ -124,13 +124,13 @@ class AudioListener:
+             if self._merge_timer is not None:
+                 self._merge_timer.cancel()
+             self._merge_timer = threading.Timer(
+-                self._MERGE_FLUSH_SECONDS, self._flush_merge_buffer, kwargs={"reason": "超时"}
++                self._merge_flush_seconds, self._flush_merge_buffer, kwargs={"reason": "超时"}
+             )
+             self._merge_timer.daemon = True
+             self._merge_timer.start()
+ 
+             # 积累够了就立刻入库
+-            if self._merge_chars >= self._MERGE_MAX_CHARS:
++            if self._merge_chars >= self._merge_min_chars:
+                 self._do_flush(reason="长度足够")
+ 
+     def _flush_merge_buffer(self, reason: str = "") -> None:
+@@ -763,4 +763,4 @@ class AudioListener:
+ 
+         if len(audio) == 0:
+             return 0.0
+-        return float(np.sqrt(np.mean(np.square(audio))))
++        return float(np.sqrt(np.mean(np.square(audio))))
+\ No newline at end of file
+diff --git a/app/config.py b/app/config.py
+index 82cc499d4f22990d4b4c6ea08dd980318f18f6ed..c0ebe7338b237e728c55950655d077d1f6f8dd4f 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -9,8 +9,8 @@ from pathlib import Path
+ 
+ 
+ DEFAULT_TRANSCRIBE_PROMPT = (
+-    "\u8fd9\u662f\u4e00\u6bb5\u4e2d\u6587\u8bfe\u5802\u6216\u7f51\u8bfe\u8bb2\u89e3\u97f3\u9891\uff0c"
+-    "\u8bf7\u8f6c\u5199\u6210\u901a\u987a\u3001\u51c6\u786e\u7684\u4e2d\u6587\u8bfe\u5802\u8bb0\u5f55\u3002"
++    "这是一段中文课堂或网课讲解音频，"
++    "请转写成通顺、准确的中文课堂记录。"
+ )
+ 
+ 
+@@ -94,6 +94,8 @@ class Settings:
+     audio_min_segment_seconds: float = 1.2
+     audio_transcribe_queue_size: int = 3
+     audio_min_rms: float = 0.006
++    audio_merge_min_chars: int = 80
++    audio_flush_seconds: float = 5.0
+     keep_audio_chunks: bool = False
+ 
+     @classmethod
+@@ -200,6 +202,8 @@ class Settings:
+                 os.environ.get("TA_AUDIO_TRANSCRIBE_QUEUE_SIZE", "3")
+             ),
+             audio_min_rms=float(os.environ.get("TA_AUDIO_MIN_RMS", "0.006")),
++            audio_merge_min_chars=int(os.environ.get("TA_MIN_CHARS", "80")),
++            audio_flush_seconds=float(os.environ.get("TA_FLUSH_SECONDS", "5.0")),
+             keep_audio_chunks=_bool_from_env("TA_KEEP_AUDIO_CHUNKS", False),
+         )
+ 
+@@ -212,4 +216,4 @@ class Settings:
+             data_dir=data_path,
+             transcript_path=data_path / "transcripts.jsonl",
+             index_path=data_path / "vector_index.json",
+-        )
++        )
+\ No newline at end of file

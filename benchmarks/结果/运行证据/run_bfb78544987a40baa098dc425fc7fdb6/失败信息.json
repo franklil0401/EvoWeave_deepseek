@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "validation_failed",
+  "message": "验收条件未满足：Settings 缺少豆包转写提示词字段、from_env 未读取 TA_DOUBAO_TRANSCRIBE_PROMPT、transcriber 豆包分支使用硬编码提示词。"
+}

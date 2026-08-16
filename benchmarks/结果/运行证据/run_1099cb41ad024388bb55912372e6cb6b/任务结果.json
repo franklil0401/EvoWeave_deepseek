@@ -1,0 +1,262 @@
+[
+  {
+    "agent_id": "agent_2370e04887c64edcb6ee407989ef2a13",
+    "artifacts": [
+      {
+        "artifact_id": "artifact_2360a622fd234f80817bf07cbd917efc",
+        "created_at": "2026-08-16T15:05:51.568765Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "6c6942ab63139da937754f9c8acac8b0bbbc03b268e701783ad5ebedf4080c4f",
+        "size_bytes": 2058,
+        "storage_key": "sha256/6c/6c6942ab63139da937754f9c8acac8b0bbbc03b268e701783ad5ebedf4080c4f"
+      },
+      {
+        "artifact_id": "artifact_8f35e331dcc74152872c6f1cda97f36e",
+        "created_at": "2026-08-16T15:06:07.299594Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "65b4660d74ba02b54495645c6fd3e73c9072d15d768d69d9ed9d6ce2807045c3",
+        "size_bytes": 3319,
+        "storage_key": "sha256/65/65b4660d74ba02b54495645c6fd3e73c9072d15d768d69d9ed9d6ce2807045c3"
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "created_at": "2026-08-15T13:16:50.242293Z",
+        "kind": "patch",
+        "media_type": "text/x-diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "storage_key": "sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_afa7cabd515e49cbb2ad3c3fe31e8e85",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_96c9386b82e9470196f3ad8a72adb0e5",
+        "kind": "file",
+        "line_end": 710,
+        "line_start": 710,
+        "repository_path": "app/audio_listener.py",
+        "summary": "在 app/audio_listener.py:710 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e0edd16919564aeb8b50edb756a613fe",
+        "kind": "file",
+        "line_end": 60,
+        "line_start": 60,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:60 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_1abe0be8315a47368f3dd3434058a3e7",
+        "kind": "file",
+        "line_end": 14,
+        "line_start": 14,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:14 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_934bb8062e8749a08ad08977ba8128ad",
+        "kind": "file",
+        "line_end": 60,
+        "line_start": 60,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:60 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_e0a3ac2313f0416bb4803f494cd44d77",
+        "kind": "file",
+        "line_end": 70,
+        "line_start": 70,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:70 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_2d1270ed1d294ae7a645641867c8d062",
+        "kind": "file",
+        "line_end": 93,
+        "line_start": 93,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:93 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_b0e3a71ae7504694a7055244dffb9bbc",
+        "kind": "file",
+        "line_end": 95,
+        "line_start": 95,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:95 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_0b67b2ec6330442793a2a31ee91ddcd6",
+        "kind": "file",
+        "line_end": 130,
+        "line_start": 130,
+        "repository_path": "app/transcriber.py",
+        "summary": "在 app/transcriber.py:130 找到匹配",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_eb2e8512ff7a4db781faca547734c02d",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/audio_listener.py",
+        "summary": "已读取 app/audio_listener.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_9fc2742fe0ad4df8af725aebe52d5f62",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_2360a622fd234f80817bf07cbd917efc",
+        "command": null,
+        "evidence_id": "evidence_59fc833eeef34d3a80e0ec026c68b18f",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_8f35e331dcc74152872c6f1cda97f36e",
+        "command": null,
+        "evidence_id": "evidence_4e4cd8ea5a8941e18eb2f310aa191541",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_bcb613f881a3443687b877331d2e34c1",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_4066d5b4271749c1bce14c4b2ffe0213",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_d44f8512602f4cbe9bcfda890597fe01",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_4340f7a202da473796360255645aa110",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": "artifact_1b3f455406634067bc7683580a1afe63",
+        "command": null,
+        "evidence_id": "evidence_6cbf253e13934ba7ae8764a8c1a5d8a6",
+        "kind": "artifact",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": null,
+        "summary": "已生成 app/transcriber.py 的补丁",
+        "symbol": null
+      },
+      {
+        "artifact_id": null,
+        "command": null,
+        "evidence_id": "evidence_858c1e4143004a4191b86a533f27dc71",
+        "kind": "file",
+        "line_end": null,
+        "line_start": null,
+        "repository_path": "app/transcriber.py",
+        "summary": "已读取 app/transcriber.py",
+        "symbol": null
+      }
+    ],
+    "execution_spec_id": "spec_39bdebf17878414fa6a920c6a98d839e",
+    "execution_spec_version": 1,
+    "failure": null,
+    "risk_level": "low",
+    "risk_notes": [],
+    "status": "succeeded",
+    "summary": "已完成 app/transcriber.py 的转写失败自动重试逻辑。改动要点：\n\n1. `transcribe_wav` 对 openai/doubao 两种云端转写调用新增 `_transcribe_with_retry` 封装。\n2. 新增 `_transcribe_with_retry(provider_name, func)`：首次调用失败时，若属于网络/服务异常（`_is_retryable_error` 判定为 openai 的 `APIConnectionError`/`APITimeoutError`/`APIStatusError` 或 `ConnectionError`/`TimeoutError`/`OSError`），自动重试一次；重试仍失败则回退并返回结构化 `TranscriptionResult`（空文本 + provider + warning 提示转写失败原因），不再向上抛出异常。\n3. 新增静态方法 `_is_retryable_error` 判断是否应触发重试。\n\n验收条件均已满足：转写异常自动重试一次；重试仍失败则回退并返回结构化结果。仅修改授权范围内的 app/transcriber.py，未改动其他路径。",
+    "task_id": "task_d3ebbb0e83f34748a7f0629d18640634",
+    "usage": {
+      "cached_input_tokens": 0,
+      "elapsed_ms": 121640,
+      "input_tokens": 589155,
+      "output_tokens": 17471,
+      "reasoning_tokens": 6684,
+      "steps": 18,
+      "tool_calls": 18
+    }
+  }
+]
