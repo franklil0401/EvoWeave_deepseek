@@ -44,7 +44,8 @@ def test_result_reducer_keeps_metadata_but_not_raw_evidence_or_logs() -> None:
     summary = ResultReducer().reduce(result=result, execution_spec=execution)
 
     serialized = summary.model_dump_json()
-    assert len(summary.summary) == 2_000
+    # 摘要收紧: 控制视图只保留 500 字符有界摘要(借鉴 dsh boundContextSummary)。
+    assert len(summary.summary) == 500
     assert "src/app.py" not in serialized
     assert "源码证据" not in serialized
     assert not hasattr(summary, "evidence")

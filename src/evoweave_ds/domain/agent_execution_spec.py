@@ -34,6 +34,11 @@ class AgentExecutionSpec(DomainModel):
     input_artifact_ids: tuple[ArtifactId, ...] = ()
     runtime_limits: RuntimeLimits = Field(default_factory=RuntimeLimits)
     output_schema: str = Field(default="TaskResult", min_length=1, max_length=255)
+    # 借鉴 dsh 可续接子代理(continuable): 默认 False 保持一次性 Worker 行为;
+    # True 时允许 Orchestrator 通过 followup/resume 对同一 Worker 追加指令或带上下文重试。
+    continuable: bool = False
+    # 续接来源: parent_spec_id 指向本 Worker 的前一执行规格(retry/followup 链)。
+    parent_spec_id: SpecId | None = None
     version: int = Field(default=1, ge=1)
 
     @field_validator("read_scope", "write_scope")

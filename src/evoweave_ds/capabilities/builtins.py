@@ -12,7 +12,7 @@ from evoweave_ds.capabilities.definitions import (
 from evoweave_ds.domain.artifacts import EvidenceRef
 from evoweave_ds.domain.enums import ArtifactKind, CapabilityAccess, EvidenceKind, RiskLevel
 from evoweave_ds.domain.errors import DomainError, ErrorCode
-from evoweave_ds.domain.identifiers import EvidenceId
+from evoweave_ds.domain.identifiers import ArtifactId, EvidenceId
 
 
 class _Arguments(BaseModel):
@@ -37,6 +37,11 @@ class _FileWriteArguments(_Arguments):
 class _CommandArguments(_Arguments):
     argv: tuple[str, ...] = Field(min_length=1)
     timeout_seconds: int = Field(default=120, ge=1, le=3_600)
+
+
+class _EvidenceReadArguments(_Arguments):
+    artifact_id: str = Field(min_length=1, max_length=128)
+    max_chars: int = Field(default=8_000, ge=256, le=100_000)
 
 
 class FileReadCapability:
@@ -224,17 +229,60 @@ class CommandRunCapability:
         )
 
 
+class EvidenceReadCapability:
+    """只读证据检索(借鉴 dsh 默认隔离+按需可查): 总调度可通过 evidence.read
+    按需拉取 Worker 证据(命令日志/产物字节), 受 read_scope 约束, 有界返回。
+    """
+
+    definition = CapabilityDefinition(
+        name="evidence.read",
+        description="按需读取已持久化的 Worker 证据(命令日志/产物), 受路径范围约束",
+        access=CapabilityAccess.READ,
+        risk_level=RiskLevel.LOW,
+        input_schema=_EvidenceReadArguments.model_json_schema(),
+    )
+
+    def invoke(
+        self,
+        arguments: dict[str, JsonValue],
+        context: CapabilityContext,
+    ) -> CapabilityResult:
+        parsed = _validate(_EvidenceReadArguments, arguments)
+        if parsed.artifact_id is None:
+            raise DomainError(
+                ErrorCode.INVALID_SPEC,
+                "evidence.read 必须提供 artifact_id",
+            )
+        artifact_id = ArtifactId(parsed.artifact_id)
+        ref = context.artifact_store.get_ref(artifact_id)
+        content = context.artifact_store.get_bytes(artifact_id).decode("utf-8", errors="replace")[
+            : parsed.max_chars
+        ]
+        return CapabilityResult(
+            summary=f"已读取证据 {artifact_id} ({ref.kind.value})",
+            details={
+                "artifact_id": str(artifact_id),
+                "kind": ref.kind.value,
+                "media_type": ref.media_type,
+                "size_bytes": ref.size_bytes,
+                "content": content,
+            },
+        )
+
+
 def default_capabilities() -> tuple[
     FileReadCapability,
     FileSearchCapability,
     FileWriteCapability,
     CommandRunCapability,
+    EvidenceReadCapability,
 ]:
     return (
         FileReadCapability(),
         FileSearchCapability(),
         FileWriteCapability(),
         CommandRunCapability(),
+        EvidenceReadCapability(),
     )
 
 

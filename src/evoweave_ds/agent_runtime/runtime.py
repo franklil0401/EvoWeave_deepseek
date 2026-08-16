@@ -72,7 +72,19 @@ class WorkerRuntime:
         self._clock = clock
         self._result_builder = ResultBuilder()
 
-    def execute(self, execution_spec: AgentExecutionSpec) -> TaskResult:
+    def execute(
+        self,
+        execution_spec: AgentExecutionSpec,
+        *,
+        resume_from: TaskResult | None = None,
+    ) -> TaskResult:
+        """执行一个 Worker。
+
+        借鉴 dsh 可续接子代理: 当 execution_spec.continuable 为 True 且传入
+        resume_from(前一执行的结果)时, 把上一次的失败诊断注入新 Worker 的
+        初始消息, 实现"带上下文重试"(Orchestrator 对同一任务续接, 而非重开
+        全新 Worker)。默认行为与旧版完全一致。
+        """
         tracker = RuntimeLimitTracker(execution_spec.runtime_limits, clock=self._clock)
         self._record(
             execution_spec,
@@ -95,6 +107,15 @@ class WorkerRuntime:
                     "初始文本上下文估算 Token 超过执行规格上限",
                 )
             messages = [_SYSTEM_MESSAGE, bundle.text]
+            if resume_from is not None:
+                if not execution_spec.continuable:
+                    raise DomainError(
+                        ErrorCode.INVALID_SPEC,
+                        "resume_from 只能用于 continuable=True 的执行规格",
+                    )
+                continuation = self._resume_context(execution_spec, resume_from)
+                if continuation:
+                    messages.append(continuation)
             tool_definitions = self._tool_executor.definitions_for(execution_spec.tool_names)
             tool_contracts = [definition.model_dump(mode="json") for definition in tool_definitions]
             gateway_tools = tuple(
@@ -322,6 +343,34 @@ class WorkerRuntime:
             )
             self._record_finished(execution_spec, result)
             return result
+
+    @staticmethod
+    def _resume_context(spec: AgentExecutionSpec, previous: TaskResult) -> str | None:
+        """构造续接上下文: 上一次的失败诊断(结构化, 有界)。
+
+        借鉴 dsh boundContextSummary 哲学: 只携带诊断性摘要, 不携带完整
+        轨迹; 轨迹仍留在事件层, 需要时走 evidence.read 按需拉取。
+        """
+        if previous.failure is None:
+            return None
+        failure = previous.failure
+        diagnostics: dict[str, JsonValue] = {
+            "error_code": failure.code.value,
+            "message": failure.message[:500],
+            "retryable": failure.retryable,
+            "attempt_version": spec.version,
+        }
+        if failure.details:
+            diagnostics["details"] = {
+                str(key): str(value)[:200]
+                for key, value in failure.details.items()
+                if str(key) in {"failed_command", "tests", "changed_paths"}
+            }
+        return (
+            "续接上下文（上一次执行未通过，请针对下列诊断修正后继续，"
+            "不要重复已被拒绝的写入）："
+            + json.dumps(diagnostics, ensure_ascii=False, sort_keys=True, default=str)[:2_000]
+        )
 
     def _complete(
         self,

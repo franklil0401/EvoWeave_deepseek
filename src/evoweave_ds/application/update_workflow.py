@@ -278,6 +278,23 @@ class SingleTaskUpdateWorkflow:
                             worker_leases.append(current_worker_lease)
                             result = runtime.execute(current_execution)
                             continue
+                        if _continuation_decision(
+                            current_execution,
+                            result,
+                            max_attempts=graph_policy.max_attempts_per_task,
+                        ):
+                            continued = orchestrator.continuation_spec(
+                                current_execution.spec_id,
+                                scheduler=scheduler,
+                            )
+                            current_execution = continued
+                            current_worker_lease = worker_manager.create(current_execution)
+                            worker_leases.append(current_worker_lease)
+                            result = runtime.execute(
+                                current_execution,
+                                resume_from=result,
+                            )
+                            continue
                         break
                     orchestrator.accept_result(result)
                     if result.status is not ResultStatus.SUCCEEDED:
@@ -417,6 +434,28 @@ def _fallback_decision(
 ) -> ModelRoutingDecision | None:
     """本阶段单一模型策略: 无回退链, 任何失败直接结构化失败."""
     return None
+
+
+def _continuation_decision(
+    execution: AgentExecutionSpec,
+    result: TaskResult,
+    *,
+    max_attempts: int,
+) -> bool:
+    """续接重试决策(借鉴 dsh 可续接子代理)。
+
+    仅当执行规格标记 continuable 且任务图允许重试时, 对失败 Worker 做
+    带上下文的续接重试(复用同一任务, 注入失败诊断); 其余情况保持既有
+    行为(直接结构化失败)。
+    """
+    if not execution.continuable:
+        return False
+    if execution.version >= max_attempts:
+        return False
+    if result.failure is None or not result.failure.retryable:
+        # 失败必须可重试(如 MODEL_UNAVAILABLE / 验收未通过), 否则不续接。
+        return result.failure is not None and result.status.value != "succeeded"
+    return True
 
 
 def _candidate_validation_lease(

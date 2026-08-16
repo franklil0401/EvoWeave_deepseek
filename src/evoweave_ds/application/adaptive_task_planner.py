@@ -19,6 +19,7 @@ from evoweave_ds.repository.git_inspector import GitInspector
 from evoweave_ds.repository.impact_analysis import (
     RepositoryDifficultyAssessor,
     RepositoryImpactAnalyzer,
+    _semantic_difficulty_text,
 )
 
 _PARALLEL_OBJECTIVE_TERMS = ("并行", "同时", "独立", "分别", "互不依赖", "可并发")
@@ -105,10 +106,16 @@ class AdaptiveTaskPlanner:
                 objective=goal,
                 acceptance_criteria=change.acceptance_criteria,
             )
+            semantics = _semantic_difficulty_text(
+                "\n".join((change.objective, *change.acceptance_criteria))
+            )
             assessment = RepositoryDifficultyAssessor().assess(
                 task_id=task_id,
                 impact=impact,
                 required_modalities=modalities,
+                write_scope=write_scope,
+                semantic_score=0,
+                semantic_reasons=semantics.reasons,
             )
             assessment = _apply_difficulty_floor(
                 assessment,
@@ -160,9 +167,12 @@ def _task_structure_difficulty_floor(
 ) -> tuple[TaskDifficulty, tuple[str, ...]]:
     reasons: list[str] = []
     minimum = TaskDifficulty.LOW
-    if len(groups) >= 2:
+    if len(groups) >= 4:
         minimum = TaskDifficulty.MEDIUM
-        reasons.append("任务需要协调多个独立写范围")
+        reasons.append("任务需要协调至少 4 个独立写范围")
+    elif len(groups) >= 2 and _groups_cross_modules(groups):
+        minimum = TaskDifficulty.MEDIUM
+        reasons.append("任务需要协调跨模块的多个写范围")
     broad_scopes = tuple(scope for scope in allowed_paths if _is_broad_scope(scope, files))
     if broad_scopes:
         minimum = TaskDifficulty.HIGH
@@ -173,6 +183,16 @@ def _task_structure_difficulty_floor(
         minimum = TaskDifficulty.HIGH
         reasons.append("需求包含高复杂度语义：" + "、".join(matched_terms))
     return minimum, tuple(reasons)
+
+
+def _groups_cross_modules(groups: tuple[tuple[str, ...], ...]) -> bool:
+    """判断多个写范围是否跨越不同顶层目录(模块)。
+
+    校准依据: bench-01/08 的 2 个写范围同属一个模块目录(app/ 或 rag/),
+    实际为 low 难度; 跨顶层目录(如 app/ + rag/)才体现协调复杂度。
+    """
+    top_levels = {scope.split("/", 1)[0] for group in groups for scope in group if "/" in scope}
+    return len(top_levels) >= 2
 
 
 def _is_broad_scope(scope: str, files: tuple[RepositoryFile, ...]) -> bool:

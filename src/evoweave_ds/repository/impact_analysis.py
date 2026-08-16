@@ -2,6 +2,7 @@
 
 import re
 from collections import defaultdict
+from dataclasses import dataclass
 
 from evoweave_ds.domain.enums import InputModality, TaskDifficulty
 from evoweave_ds.domain.identifiers import EvidenceId, SpecId, TaskId
@@ -229,6 +230,38 @@ class RepositoryImpactAnalyzer:
         )
 
 
+_BEHAVIOR_TERMS = ("重试", "容错", "回退", "异常", "恢复", "损坏", "原子", "重建")
+_COMPAT_TERMS = ("可选", "保持不变", "保持原行为", "默认一致", "不提供时", "行为与原来一致")
+
+
+@dataclass(frozen=True, slots=True)
+class _SemanticDifficulty:
+    score: int
+    reasons: tuple[str, ...]
+
+
+def _semantic_difficulty_text(text: str) -> _SemanticDifficulty:
+    """基于需求语义的难度修正(辅助信号, 不覆盖写范围与结构信号)。
+
+    行为逻辑词(重试/容错/回退/异常)提示中等难度(+4, 单文件行为修改也判
+    中等); 兼容词(可选/保持不变)提示低难度(-3, 参数化默认值/加可选参数
+    判低)。
+    """
+    folded = text.casefold()
+    behavior_hits = tuple(term for term in _BEHAVIOR_TERMS if term in folded)
+    compat_hits = tuple(term for term in _COMPAT_TERMS if term in folded)
+    score = 0
+    reasons: list[str] = []
+    if behavior_hits:
+        # 行为逻辑词固定 +2 (行为修改是中等难度信号, 不与结构分叠加成高)。
+        score += 2
+        reasons.append("需求包含行为逻辑词：" + "、".join(behavior_hits))
+    if compat_hits:
+        score -= 3
+        reasons.append("需求强调向后兼容或可选性")
+    return _SemanticDifficulty(score=score, reasons=tuple(reasons))
+
+
 class RepositoryDifficultyAssessor:
     def assess(
         self,
@@ -237,6 +270,9 @@ class RepositoryDifficultyAssessor:
         impact: ImpactAnalysis,
         required_modalities: tuple[InputModality, ...] = (InputModality.TEXT,),
         previous_requirement: ModelRequirement | None = None,
+        write_scope: tuple[str, ...] = (),
+        semantic_score: int = 0,
+        semantic_reasons: tuple[str, ...] = (),
     ) -> RepositoryTaskAssessment:
         score = 0
         reasons: list[str] = []
@@ -245,22 +281,29 @@ class RepositoryDifficultyAssessor:
             for candidate in impact.candidates
             if any(reason.startswith("需求显式提到路径") for reason in candidate.reasons)
         }
-        impacted_files = len(explicit_candidates) if explicit_candidates else len(impact.candidates)
+        # 校准 v2: 写范围(用户授权的确定性修改目标)是难度主信号;
+        # 词法命中的松散候选(tests/sample/文档)只做辅助, 不再直接计分。
+        write_files = len(write_scope)
+        if write_files >= 4:
+            score += 4
+            reasons.append("写范围覆盖至少 4 个文件")
+        elif write_files >= 2:
+            score += 2
+            reasons.append("写范围覆盖多个文件")
+        # 显式路径命中只在与写范围重合时加分(需求点名修改的文件)。
+        in_scope_explicit = explicit_candidates.intersection(write_scope)
+        if len(in_scope_explicit) >= 2 and write_files >= 2:
+            score += 1
+            reasons.append("显式点名路径与写范围重合")
+        if impact.dependency_fan_out >= 4 and write_files >= 2:
+            score += 2
+            reasons.append("写范围模块依赖扇出至少为 4")
+        elif impact.dependency_fan_out >= 2 and write_files >= 2:
+            score += 1
+            reasons.append("写范围模块存在依赖扇出")
         if not impact.candidates:
             score += 7
             reasons.append("没有可定位的候选影响范围")
-        if impacted_files >= 6:
-            score += 5
-            reasons.append("候选影响文件至少 6 个")
-        elif impacted_files >= 2:
-            score += 2
-            reasons.append("候选影响文件跨越多个文件")
-        if impacted_files > 1 and impact.dependency_fan_out >= 4:
-            score += 3
-            reasons.append("候选模块依赖扇出至少为 4")
-        elif impacted_files > 1 and impact.dependency_fan_out >= 2:
-            score += 1
-            reasons.append("候选模块存在依赖扇出")
         if impact.ambiguity >= 0.6 or impact.confidence < 0.4:
             score += 4
             reasons.append("定位歧义高或置信度低")
@@ -270,6 +313,9 @@ class RepositoryDifficultyAssessor:
         if impact.risk_signals:
             score += 4
             reasons.append("包含风险信号：" + "、".join(impact.risk_signals))
+        if semantic_score:
+            score += semantic_score
+            reasons.extend(semantic_reasons)
 
         if score <= 2:
             difficulty = TaskDifficulty.LOW
@@ -277,6 +323,16 @@ class RepositoryDifficultyAssessor:
             difficulty = TaskDifficulty.MEDIUM
         else:
             difficulty = TaskDifficulty.HIGH
+        # 语义信号以"最低/最高难度保证"方式后处理, 避免与结构分叠加过冲:
+        # 行为逻辑词 => 至少 medium; 兼容词 => 至多 low(结构 high 不降)。
+        if any(reason.startswith("需求包含行为逻辑词") for reason in semantic_reasons):
+            if difficulty is TaskDifficulty.LOW:
+                difficulty = TaskDifficulty.MEDIUM
+        if any(reason.startswith("需求强调向后兼容") for reason in semantic_reasons):
+            if difficulty is TaskDifficulty.HIGH:
+                difficulty = TaskDifficulty.MEDIUM
+            elif difficulty is TaskDifficulty.MEDIUM:
+                difficulty = TaskDifficulty.LOW
         evidence_ids = tuple(
             dict.fromkeys(
                 evidence_id

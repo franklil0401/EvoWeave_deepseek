@@ -11,7 +11,7 @@ from evoweave_ds.domain.agent_execution_spec import AgentExecutionSpec
 from evoweave_ds.domain.enums import ResultStatus, TaskLeaseStatus, TaskRelation, TaskStatus
 from evoweave_ds.domain.errors import DomainError, ErrorCode
 from evoweave_ds.domain.graph_models import GraphSnapshot, TaskEdge
-from evoweave_ds.domain.identifiers import SpecId, TaskId
+from evoweave_ds.domain.identifiers import AgentId, SpecId, TaskId
 from evoweave_ds.domain.model_routing import ModelRoutingDecision
 from evoweave_ds.domain.policies import GraphPolicy
 from evoweave_ds.domain.ports import DecisionLedger, GraphStateStore
@@ -296,6 +296,51 @@ class Orchestrator:
             self._leases[revised.spec_id] = revised_lease
             self._persist()
             return revised
+        except Exception:
+            self._restore_rollback_state(before)
+            raise
+
+    def continuation_spec(
+        self,
+        execution_spec_id: SpecId,
+        *,
+        scheduler: Scheduler,
+    ) -> AgentExecutionSpec:
+        """续接同一任务: 生成下一版本的 continuable 执行规格(带上下文重试)。
+
+        借鉴 dsh 可续接子代理(followup/resume): 失败 Worker 不重开全新
+        会话, 而是基于上一执行规格派生新版本, 由 WorkerRuntime 注入失败
+        诊断后带上下文重试。
+        """
+        try:
+            previous = self._execution_specs[execution_spec_id]
+            previous_lease = self._leases[execution_spec_id]
+        except KeyError as exc:
+            raise DomainError(ErrorCode.INVALID_SPEC, "续接目标没有已知执行规格和租约") from exc
+        if previous_lease.status is not TaskLeaseStatus.ACTIVE:
+            raise DomainError(ErrorCode.INVALID_STATE_TRANSITION, "只能续接仍处于活跃租约的 Agent")
+
+        before = self._rollback_state()
+        try:
+            continued = previous.model_copy(
+                update={
+                    "spec_id": SpecId.new(),
+                    "agent_id": AgentId.new(),
+                    "version": previous.version + 1,
+                    "continuable": True,
+                    "parent_spec_id": previous.spec_id,
+                }
+            )
+            self._graph.transition(previous.task_id, TaskStatus.READY)
+            self._leases[execution_spec_id] = previous_lease.model_copy(
+                update={"status": TaskLeaseStatus.RELEASED}
+            )
+            continued_lease = scheduler.lease(self._graph, continued)
+            self._graph.transition(previous.task_id, TaskStatus.RUNNING)
+            self._execution_specs[continued.spec_id] = continued
+            self._leases[continued.spec_id] = continued_lease
+            self._persist()
+            return continued
         except Exception:
             self._restore_rollback_state(before)
             raise

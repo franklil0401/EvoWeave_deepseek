@@ -36,7 +36,12 @@ class ResultControlSummary(DomainModel):
     agent_id: AgentId
     execution_spec_id: SpecId
     status: ResultStatus
-    summary: str = Field(min_length=1, max_length=2_000)
+    # 借鉴 dsh boundContextSummary: 控制视图只携带有界摘要(500 字符),
+    # 完整轨迹留在事件/证据层, 需要时走 evidence.read 按需拉取。
+    summary: str = Field(min_length=1, max_length=500)
+    # 失败诊断(结构化): 失败命令、相关测试名、变更文件等, 让总调度不做
+    # 证据拉取也能做二次决策。
+    diagnostics: tuple[str, ...] = ()
     artifacts: tuple[ArtifactMetadata, ...] = ()
     suggestions: tuple[TaskSuggestion, ...] = ()
 
