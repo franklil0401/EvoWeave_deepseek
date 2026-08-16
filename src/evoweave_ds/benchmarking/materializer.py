@@ -25,9 +25,10 @@ class MaterializedRepository:
 class FixtureMaterializer:
     def __init__(self, project_root: Path | str) -> None:
         self._project_root = Path(project_root).resolve(strict=True)
-        self._fixture_root = (self._project_root / "tests/fixtures/repositories").resolve(
-            strict=True
-        )
+        fixture_root = self._project_root / "tests/fixtures/repositories"
+        # 外部仓库模式不需要本地 fixtures: 路径不存在时延迟解析,
+        # 仅在使用 fixture 任务时按需校验。
+        self._fixture_root = fixture_root.resolve() if fixture_root.exists() else fixture_root
 
     def materialize(
         self,
