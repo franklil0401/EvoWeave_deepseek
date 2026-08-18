@@ -1,0 +1,8 @@
+{
+  "details": {
+    "http_status": 402,
+    "provider_error_code": "invalid_request_error"
+  },
+  "error_code": "model_unavailable",
+  "message": "模型服务返回非成功状态"
+}

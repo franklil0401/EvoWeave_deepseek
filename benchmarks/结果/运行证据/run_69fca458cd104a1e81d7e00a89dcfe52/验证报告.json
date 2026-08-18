@@ -1,0 +1,566 @@
+{
+  "report_id": "spec_e902f701de11402a8396e534e9fb49b6",
+  "run_id": "run_69fca458cd104a1e81d7e00a89dcfe52",
+  "integration_id": "integration_90b5839a3d9f434d9a4cd1a7ac44e6e8",
+  "base_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+  "candidate_commit": "1e5bea9c7b5ede9bc80f49b062701480cf065f70",
+  "accepted": false,
+  "applied_patches": [
+    {
+      "sequence": 1,
+      "artifact_id": "artifact_fa42eaad39484aba9bcdcf8f587f1cce",
+      "task_id": "task_c0cd1009cc8143fa8e0f7f4975e74044",
+      "before_commit": "2a8a38b051fc248865730bf3511bf2e2ea325e81",
+      "after_commit": "1e5bea9c7b5ede9bc80f49b062701480cf065f70",
+      "changed_paths": [
+        "src/flask/json/provider.py"
+      ],
+      "applied_at": "2026-08-18T15:38:45.409710Z"
+    }
+  ],
+  "observations": [
+    {
+      "command_id": "spec_424697bd44a049059c299678abb0344f",
+      "command_name": "局部测试",
+      "scope": "local",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 312,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_424697bd44a049059c299678abb0344f:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_e0ee5efcc748467b930bdc6a45d40999",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 1137,
+        "sha256": "6660eb48374c9b6b1f746542d6003cdd68486bd4526d2d84b9e455cc075d761e",
+        "storage_key": "sha256/66/6660eb48374c9b6b1f746542d6003cdd68486bd4526d2d84b9e455cc075d761e",
+        "created_at": "2026-08-18T15:38:46.259734Z"
+      }
+    },
+    {
+      "command_id": "spec_58c0c2e88c8c448cad97ca2b2f0daa92",
+      "command_name": "影响测试",
+      "scope": "impact",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py",
+        "tests/test_apps/cliapp/inner1/__init__.py",
+        "tests/test_apps/cliapp/inner1/inner2/flask.py",
+        "tests/test_apps/cliapp/multiapp.py",
+        "tests/test_apps/helloworld/hello.py",
+        "tests/test_apps/helloworld/wsgi.py",
+        "tests/test_apps/subdomaintestmodule/__init__.py",
+        "tests/test_async.py",
+        "tests/test_basic.py",
+        "tests/test_blueprints.py",
+        "tests/test_cli.py",
+        "tests/test_config.py",
+        "tests/test_converters.py",
+        "tests/test_helpers.py",
+        "tests/test_instance_config.py",
+        "tests/test_json.py",
+        "tests/test_json_tag.py",
+        "tests/test_logging.py",
+        "tests/test_regression.py",
+        "tests/test_reqctx.py",
+        "tests/test_request.py",
+        "tests/test_session_interface.py",
+        "tests/test_signals.py",
+        "tests/test_subclassing.py",
+        "tests/test_templating.py",
+        "tests/test_testing.py",
+        "tests/test_user_error_handler.py",
+        "tests/test_views.py",
+        "tests/type_check/typing_app_decorators.py",
+        "tests/type_check/typing_error_handler.py",
+        "tests/type_check/typing_route.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 328,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_58c0c2e88c8c448cad97ca2b2f0daa92:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_3ee1db9f8c8a4107ac8d2d6c29336683",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 2049,
+        "sha256": "dad851a6d61f72aaa0fe86c556fae9c67467e9cee38f33b6ad51d2b342991883",
+        "storage_key": "sha256/da/dad851a6d61f72aaa0fe86c556fae9c67467e9cee38f33b6ad51d2b342991883",
+        "created_at": "2026-08-18T15:38:46.751246Z"
+      }
+    },
+    {
+      "command_id": "spec_76a16f5430d7412fb638648b753165dd",
+      "command_name": "全量回归",
+      "scope": "full",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 311,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_76a16f5430d7412fb638648b753165dd:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_ac688e801e7f488aac78de6d14da2add",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 836,
+        "sha256": "bef04da02c89793f9bb31c07a36c09c001868d5b60ce6e5cda5fd1281a31f611",
+        "storage_key": "sha256/be/bef04da02c89793f9bb31c07a36c09c001868d5b60ce6e5cda5fd1281a31f611",
+        "created_at": "2026-08-18T15:38:47.159698Z"
+      }
+    },
+    {
+      "command_id": "spec_f3fec03c44d8478aaa6266c981bad962",
+      "command_name": "Ruff 门禁",
+      "scope": "lint",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 155,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_3333acf6cd14436c89ed8a425b2e7e9e",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 282,
+        "sha256": "eba182ed18b6256594b97a9e4a03a3172ff99cde43941db65957a607305db1d4",
+        "storage_key": "sha256/eb/eba182ed18b6256594b97a9e4a03a3172ff99cde43941db65957a607305db1d4",
+        "created_at": "2026-08-18T15:38:47.432427Z"
+      }
+    },
+    {
+      "command_id": "spec_90715b6bf5e644c5bd8738f0b666208d",
+      "command_name": "隐藏验收:bench-12-json-sort-config",
+      "scope": "full",
+      "phase": "baseline",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "E:\\mutil_Agent\\deepseek\\EvoWeave_deepseek\\benchmarks\\任务集\\隐藏验收\\hidden_acceptance_flask.py",
+        "bench-12-json-sort-config"
+      ],
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 47,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_90715b6bf5e644c5bd8738f0b666208d:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_86287b61c9bb4c2e8afa8cd3a4394615",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 471,
+        "sha256": "0b95da33e5f3c9c71e89f8174c8b8ccf31b55afbea11bb3ef46fb71fc22022c0",
+        "storage_key": "sha256/0b/0b95da33e5f3c9c71e89f8174c8b8ccf31b55afbea11bb3ef46fb71fc22022c0",
+        "created_at": "2026-08-18T15:38:47.590834Z"
+      }
+    },
+    {
+      "command_id": "spec_424697bd44a049059c299678abb0344f",
+      "command_name": "局部测试",
+      "scope": "local",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 313,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_424697bd44a049059c299678abb0344f:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_d9479b4737a44611a1e5f02bd539ef02",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 1143,
+        "sha256": "60c2c7588ef515b4480ee9a72fae570117045c9d4be66af9116010585bcd9cba",
+        "storage_key": "sha256/60/60c2c7588ef515b4480ee9a72fae570117045c9d4be66af9116010585bcd9cba",
+        "created_at": "2026-08-18T15:38:48.001748Z"
+      }
+    },
+    {
+      "command_id": "spec_58c0c2e88c8c448cad97ca2b2f0daa92",
+      "command_name": "影响测试",
+      "scope": "impact",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py",
+        "tests/test_apps/cliapp/inner1/__init__.py",
+        "tests/test_apps/cliapp/inner1/inner2/flask.py",
+        "tests/test_apps/cliapp/multiapp.py",
+        "tests/test_apps/helloworld/hello.py",
+        "tests/test_apps/helloworld/wsgi.py",
+        "tests/test_apps/subdomaintestmodule/__init__.py",
+        "tests/test_async.py",
+        "tests/test_basic.py",
+        "tests/test_blueprints.py",
+        "tests/test_cli.py",
+        "tests/test_config.py",
+        "tests/test_converters.py",
+        "tests/test_helpers.py",
+        "tests/test_instance_config.py",
+        "tests/test_json.py",
+        "tests/test_json_tag.py",
+        "tests/test_logging.py",
+        "tests/test_regression.py",
+        "tests/test_reqctx.py",
+        "tests/test_request.py",
+        "tests/test_session_interface.py",
+        "tests/test_signals.py",
+        "tests/test_subclassing.py",
+        "tests/test_templating.py",
+        "tests/test_testing.py",
+        "tests/test_user_error_handler.py",
+        "tests/test_views.py",
+        "tests/type_check/typing_app_decorators.py",
+        "tests/type_check/typing_error_handler.py",
+        "tests/type_check/typing_route.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 311,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_58c0c2e88c8c448cad97ca2b2f0daa92:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_39946d3cbe7a45258d9c30da43731252",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 2055,
+        "sha256": "25cfe42a18b35a2d1e5ffa9c13823cd7c43fca6c3ac0ef08a550f5ec2ee2a832",
+        "storage_key": "sha256/25/25cfe42a18b35a2d1e5ffa9c13823cd7c43fca6c3ac0ef08a550f5ec2ee2a832",
+        "created_at": "2026-08-18T15:38:48.401973Z"
+      }
+    },
+    {
+      "command_id": "spec_76a16f5430d7412fb638648b753165dd",
+      "command_name": "全量回归",
+      "scope": "full",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 312,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_76a16f5430d7412fb638648b753165dd:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_6c705f736967417991ab2d0bc667263c",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 842,
+        "sha256": "e4e647133977ab66be33a8e75198133d2492cee011841e7c261c92c0e3789b23",
+        "storage_key": "sha256/e4/e4e647133977ab66be33a8e75198133d2492cee011841e7c261c92c0e3789b23",
+        "created_at": "2026-08-18T15:38:48.802318Z"
+      }
+    },
+    {
+      "command_id": "spec_f3fec03c44d8478aaa6266c981bad962",
+      "command_name": "Ruff 门禁",
+      "scope": "lint",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 157,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_410f8d7e02b5442bac865320539eda3b",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 404,
+        "sha256": "a85ee715149f699be682255a653e627900bded5f275183c32de15cce6222e934",
+        "storage_key": "sha256/a8/a85ee715149f699be682255a653e627900bded5f275183c32de15cce6222e934",
+        "created_at": "2026-08-18T15:38:49.058142Z"
+      }
+    },
+    {
+      "command_id": "spec_90715b6bf5e644c5bd8738f0b666208d",
+      "command_name": "隐藏验收:bench-12-json-sort-config",
+      "scope": "full",
+      "phase": "candidate",
+      "attempt": 1,
+      "argv": [
+        "python",
+        "E:\\mutil_Agent\\deepseek\\EvoWeave_deepseek\\benchmarks\\任务集\\隐藏验收\\hidden_acceptance_flask.py",
+        "bench-12-json-sort-config"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 47,
+      "output_truncated": false,
+      "failure_keys": [],
+      "log_ref": {
+        "artifact_id": "artifact_9d8d9306ed9748438d851e06ddec6ba0",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 439,
+        "sha256": "07baa5cc7be25fd7ead00d3c449fca8ff9eebe14dc49abd96af0bc904b6e4fd2",
+        "storage_key": "sha256/07/07baa5cc7be25fd7ead00d3c449fca8ff9eebe14dc49abd96af0bc904b6e4fd2",
+        "created_at": "2026-08-18T15:38:49.208365Z"
+      }
+    },
+    {
+      "command_id": "spec_424697bd44a049059c299678abb0344f",
+      "command_name": "局部测试",
+      "scope": "local",
+      "phase": "candidate_retry",
+      "attempt": 2,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 297,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_424697bd44a049059c299678abb0344f:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_5f3297bfa9744d28a04b6c72741d0beb",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 1149,
+        "sha256": "c497012e77b9ed801e38ba2fc51d8dbbc8a2708c1d040922bddb27c39456ab12",
+        "storage_key": "sha256/c4/c497012e77b9ed801e38ba2fc51d8dbbc8a2708c1d040922bddb27c39456ab12",
+        "created_at": "2026-08-18T15:38:49.616319Z"
+      }
+    },
+    {
+      "command_id": "spec_58c0c2e88c8c448cad97ca2b2f0daa92",
+      "command_name": "影响测试",
+      "scope": "impact",
+      "phase": "candidate_retry",
+      "attempt": 2,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/conftest.py",
+        "tests/test_appctx.py",
+        "tests/test_apps/blueprintapp/__init__.py",
+        "tests/test_apps/blueprintapp/apps/admin/__init__.py",
+        "tests/test_apps/blueprintapp/apps/frontend/__init__.py",
+        "tests/test_apps/cliapp/app.py",
+        "tests/test_apps/cliapp/factory.py",
+        "tests/test_apps/cliapp/importerrorapp.py",
+        "tests/test_apps/cliapp/inner1/__init__.py",
+        "tests/test_apps/cliapp/inner1/inner2/flask.py",
+        "tests/test_apps/cliapp/multiapp.py",
+        "tests/test_apps/helloworld/hello.py",
+        "tests/test_apps/helloworld/wsgi.py",
+        "tests/test_apps/subdomaintestmodule/__init__.py",
+        "tests/test_async.py",
+        "tests/test_basic.py",
+        "tests/test_blueprints.py",
+        "tests/test_cli.py",
+        "tests/test_config.py",
+        "tests/test_converters.py",
+        "tests/test_helpers.py",
+        "tests/test_instance_config.py",
+        "tests/test_json.py",
+        "tests/test_json_tag.py",
+        "tests/test_logging.py",
+        "tests/test_regression.py",
+        "tests/test_reqctx.py",
+        "tests/test_request.py",
+        "tests/test_session_interface.py",
+        "tests/test_signals.py",
+        "tests/test_subclassing.py",
+        "tests/test_templating.py",
+        "tests/test_testing.py",
+        "tests/test_user_error_handler.py",
+        "tests/test_views.py",
+        "tests/type_check/typing_app_decorators.py",
+        "tests/type_check/typing_error_handler.py",
+        "tests/type_check/typing_route.py"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 297,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_58c0c2e88c8c448cad97ca2b2f0daa92:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_9c6f9db4499b40c6a57e61bd0fbd2cbd",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 2061,
+        "sha256": "210c25764afc1efedeab99e76d7b2707ea358fff9ebd29e6b88b34b6d99d060b",
+        "storage_key": "sha256/21/210c25764afc1efedeab99e76d7b2707ea358fff9ebd29e6b88b34b6d99d060b",
+        "created_at": "2026-08-18T15:38:50.027523Z"
+      }
+    },
+    {
+      "command_id": "spec_76a16f5430d7412fb638648b753165dd",
+      "command_name": "全量回归",
+      "scope": "full",
+      "phase": "candidate_retry",
+      "attempt": 2,
+      "argv": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "exit_code": 4,
+      "timed_out": false,
+      "duration_ms": 296,
+      "output_truncated": false,
+      "failure_keys": [
+        "command:spec_76a16f5430d7412fb638648b753165dd:nonzero"
+      ],
+      "log_ref": {
+        "artifact_id": "artifact_c4bb36ebcfbc4e3cb479db7ebef8b11b",
+        "kind": "command_log",
+        "media_type": "application/json",
+        "size_bytes": 848,
+        "sha256": "c15059e9018daf3b8c80baed8c92d6467c57604c7a4449847f616bc2a5ffe7d8",
+        "storage_key": "sha256/c1/c15059e9018daf3b8c80baed8c92d6467c57604c7a4449847f616bc2a5ffe7d8",
+        "created_at": "2026-08-18T15:38:50.427669Z"
+      }
+    }
+  ],
+  "failure_deltas": [
+    {
+      "command_id": "spec_424697bd44a049059c299678abb0344f",
+      "failure_key": "command:spec_424697bd44a049059c299678abb0344f:nonzero",
+      "classification": "pre_existing"
+    },
+    {
+      "command_id": "spec_58c0c2e88c8c448cad97ca2b2f0daa92",
+      "failure_key": "command:spec_58c0c2e88c8c448cad97ca2b2f0daa92:nonzero",
+      "classification": "pre_existing"
+    },
+    {
+      "command_id": "spec_76a16f5430d7412fb638648b753165dd",
+      "failure_key": "command:spec_76a16f5430d7412fb638648b753165dd:nonzero",
+      "classification": "pre_existing"
+    },
+    {
+      "command_id": "spec_90715b6bf5e644c5bd8738f0b666208d",
+      "failure_key": "command:spec_90715b6bf5e644c5bd8738f0b666208d:nonzero",
+      "classification": "resolved"
+    }
+  ],
+  "report_ref": {
+    "artifact_id": "artifact_74c39119515a4389a703ad320f4b832d",
+    "kind": "test_report",
+    "media_type": "application/json",
+    "size_bytes": 19403,
+    "sha256": "a068f0dad41000557d81b70c866f937889854e2f20d025c53ee171beeba67255",
+    "storage_key": "sha256/a0/a068f0dad41000557d81b70c866f937889854e2f20d025c53ee171beeba67255",
+    "created_at": "2026-08-18T15:38:50.527832Z"
+  }
+}

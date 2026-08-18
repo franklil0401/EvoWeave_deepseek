@@ -1,0 +1,61 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..41a064262e53e5b52c462000d373a6f8cc9fa324 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,12 +116,12 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+     Usually you create a :class:`Flask` instance in your main module or
+-    in the :file:`__init__.py` file of your package like this::
++    in the :file:`__init__.py` file of your application like this::
+ 
+         from flask import Flask
+         app = Flask(__name__)
+@@ -208,6 +208,7 @@ class Flask(App):
+         {
+             "DEBUG": None,
+             "TESTING": False,
++            "TESTING_FOLLOW_REDIRECTS": False,
+             "PROPAGATE_EXCEPTIONS": None,
+             "SECRET_KEY": None,
+             "SECRET_KEY_FALLBACKS": None,
+@@ -1625,4 +1626,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file
+diff --git a/src/flask/testing.py b/src/flask/testing.py
+index 8d058ca00d3d7704678a4b47c01981b939114990..dd0ef425b5e0359696cf4b73849005019e07a1ad 100644
+--- a/src/flask/testing.py
++++ b/src/flask/testing.py
+@@ -205,9 +205,14 @@ class FlaskClient(Client):
+         self,
+         *args: t.Any,
+         buffered: bool = False,
+-        follow_redirects: bool = False,
++        follow_redirects: bool | None = None,
+         **kwargs: t.Any,
+     ) -> TestResponse:
++        if follow_redirects is None:
++            follow_redirects = self.application.config.get(
++                "TESTING_FOLLOW_REDIRECTS", False
++            )
++
+         if args and isinstance(
+             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
+         ):
+@@ -295,4 +300,4 @@ class FlaskCliRunner(CliRunner):
+         if "obj" not in kwargs:
+             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
+ 
+-        return super().invoke(cli, args, **kwargs)
++        return super().invoke(cli, args, **kwargs)
+\ No newline at end of file

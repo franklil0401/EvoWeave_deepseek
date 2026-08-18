@@ -1,0 +1,44 @@
+diff --git a/src/flask/config.py b/src/flask/config.py
+index 34ef1a57217878e21daba0bc4f20ded293a33e7e..8fddd4b3e4a95641e1402b5f3b66edb4031015b1 100644
+--- a/src/flask/config.py
++++ b/src/flask/config.py
+@@ -99,7 +99,9 @@ class Config(dict):  # type: ignore[type-arg]
+         super().__init__(defaults or {})
+         self.root_path = root_path
+ 
+-    def from_envvar(self, variable_name: str, silent: bool = False) -> bool:
++    def from_envvar(
++        self, variable_name: str, silent: bool = False, *, required: bool = False
++    ) -> bool:
+         """Loads a configuration from an environment variable pointing to
+         a configuration file.  This is basically just a shortcut with nicer
+         error messages for this line of code::
+@@ -109,10 +111,21 @@ class Config(dict):  # type: ignore[type-arg]
+         :param variable_name: name of the environment variable
+         :param silent: set to ``True`` if you want silent failure for missing
+                        files.
++        :param required: set to ``True`` if you want an error to be raised
++                         when the environment variable is not set.
+         :return: ``True`` if the file was loaded successfully.
++
++        .. versionchanged:: 3.2
++            The ``required`` parameter was added.
+         """
+         rv = os.environ.get(variable_name)
+         if not rv:
++            if required:
++                raise RuntimeError(
++                    f"The environment variable {variable_name!r} is required"
++                    " but is not set. Set this variable and make it point to a"
++                    " configuration file"
++                )
+             if silent:
+                 return False
+             raise RuntimeError(
+@@ -364,4 +377,4 @@ class Config(dict):  # type: ignore[type-arg]
+         return rv
+ 
+     def __repr__(self) -> str:
+-        return f"<{type(self).__name__} {dict.__repr__(self)}>"
++        return f"<{type(self).__name__} {dict.__repr__(self)}>"
+\ No newline at end of file

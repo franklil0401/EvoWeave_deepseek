@@ -1,0 +1,41 @@
+diff --git a/src/flask/json/provider.py b/src/flask/json/provider.py
+index f37cb7b2096f2be56c7ba3e60d7a2e9751f346a8..3bcb38cf931bd8c849dd6d4daa77f7ee02f2fecc 100644
+--- a/src/flask/json/provider.py
++++ b/src/flask/json/provider.py
+@@ -152,6 +152,9 @@ class DefaultJSONProvider(JSONProvider):
+     some caching situations, but can be disabled for better performance.
+     When enabled, keys must all be strings, they are not converted
+     before sorting.
++
++    When the application config has a ``JSON_SORT_KEYS`` setting, that
++    value takes precedence over this attribute.
+     """
+ 
+     compact: bool | None = None
+@@ -170,12 +173,18 @@ class DefaultJSONProvider(JSONProvider):
+         parameter defaults from the :attr:`default`,
+         :attr:`ensure_ascii`, and :attr:`sort_keys` attributes.
+ 
++        If the application config has a ``JSON_SORT_KEYS`` setting, it
++        takes precedence over the :attr:`sort_keys` attribute when
++        determining the default for the ``sort_keys`` keyword argument.
++
+         :param obj: The data to serialize.
+         :param kwargs: Passed to :func:`json.dumps`.
+         """
+         kwargs.setdefault("default", self.default)
+         kwargs.setdefault("ensure_ascii", self.ensure_ascii)
+-        kwargs.setdefault("sort_keys", self.sort_keys)
++        kwargs.setdefault(
++            "sort_keys", self._app.config.get("JSON_SORT_KEYS", self.sort_keys)
++        )
+         return json.dumps(obj, **kwargs)
+ 
+     def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
+@@ -212,4 +221,4 @@ class DefaultJSONProvider(JSONProvider):
+ 
+         return self._app.response_class(
+             f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+-        )
++        )
+\ No newline at end of file

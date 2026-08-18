@@ -1,0 +1,78 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..079b993b9f97a1f572b360e5ae1c0ad67d9eb6a2 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,7 +116,7 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+@@ -166,7 +166,7 @@ class Flask(App):
+        The `root_path` parameter was added.
+ 
+     .. versionadded:: 1.0
+-       The ``host_matching`` and ``static_host`` parameters were added.
++       The ``host_matching`` and ``subdomain_matching`` parameters were added.
+ 
+     .. versionadded:: 1.0
+        The ``subdomain_matching`` parameter was added. Subdomain
+@@ -428,7 +428,7 @@ class Flask(App):
+ 
+         :param resource: Path to the resource relative to :attr:`root_path`.
+         :param mode: Open the file in this mode. Only reading is supported,
+-            valid values are ``"r"`` (or ``"rt"``) and ``"rb"``.
++            valid values are ``\"r\"`` (or ``\"rt\"``) and ``\"rb\"``.
+         :param encoding: Open the file with this encoding when opening in text
+             mode. This is ignored when opening in binary mode.
+ 
+@@ -834,8 +834,9 @@ class Flask(App):
+         self, ctx: AppContext, e: HTTPException
+     ) -> HTTPException | ft.ResponseReturnValue:
+         """Handles an HTTP exception.  By default this will invoke the
+-        registered error handlers and fall back to returning the
+-        exception as response.
++        registered error handlers and fall back to the
++        :meth:`make_http_error_response` method to create the default
++        response.
+ 
+         .. versionchanged:: 1.0.3
+             ``RoutingException``, used internally for actions such as
+@@ -862,9 +863,26 @@ class Flask(App):
+ 
+         handler = self._find_error_handler(e, ctx.request.blueprints)
+         if handler is None:
+-            return e
++            return self.make_http_error_response(ctx, e)
+         return self.ensure_sync(handler)(e)  # type: ignore[no-any-return]
+ 
++    def make_http_error_response(
++        self, ctx: AppContext, e: HTTPException
++    ) -> HTTPException | ft.ResponseReturnValue:
++        """Create the default response for an :class:`~werkzeug.exceptions
++        .HTTPException` that was not handled by a registered error handler.
++
++        This method is called by :meth:`handle_http_exception` when there is
++        no error handler registered for the exception. By default it returns
++        the exception unchanged, which is then finalized into a response by
++        the application. Subclasses can override this method to provide a
++        custom, uniform response format (for example, an HTML error page or a
++        JSON error body) for all HTTP errors.
++
++        .. versionadded:: 3.2
++        """
++        return e
++
+     def handle_user_exception(
+         self, ctx: AppContext, e: Exception
+     ) -> HTTPException | ft.ResponseReturnValue:
+@@ -1625,4 +1643,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file

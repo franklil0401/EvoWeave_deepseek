@@ -1,0 +1,150 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..307bad176fa887c8f1ea15bffdde712c77caac7d 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,7 +116,7 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+@@ -228,6 +228,7 @@ class Flask(App):
+             "MAX_FORM_MEMORY_SIZE": 500_000,
+             "MAX_FORM_PARTS": 1_000,
+             "SEND_FILE_MAX_AGE_DEFAULT": None,
++            "SEND_STATIC_SECURITY_HEADERS": True,
+             "TRAP_BAD_REQUEST_ERRORS": None,
+             "TRAP_HTTP_EXCEPTIONS": False,
+             "EXPLAIN_TEMPLATE_LOADING": False,
+@@ -399,6 +400,16 @@ class Flask(App):
+         Note this is a duplicate of the same method in the Flask
+         class.
+ 
++        The response includes the ``X-Content-Type-Options: nosniff``
++        header by default to reduce the risk of MIME type sniffing. This
++        can be disabled by setting :data:`SEND_STATIC_SECURITY_HEADERS`
++        to ``False``.
++
++        .. versionchanged:: 3.2
++            The ``X-Content-Type-Options: nosniff`` header is added to
++            responses by default, unless
++            :data:`SEND_STATIC_SECURITY_HEADERS` is set to ``False``.
++
+         .. versionadded:: 0.5
+ 
+         """
+@@ -408,10 +419,15 @@ class Flask(App):
+         # send_file only knows to call get_send_file_max_age on the app,
+         # call it here so it works for blueprints too.
+         max_age = self.get_send_file_max_age(filename)
+-        return send_from_directory(
++        response = send_from_directory(
+             t.cast(str, self.static_folder), filename, max_age=max_age
+         )
+ 
++        if self.config["SEND_STATIC_SECURITY_HEADERS"]:
++            response.headers.setdefault("X-Content-Type-Options", "nosniff")
++
++        return response
++
+     def open_resource(
+         self, resource: str, mode: str = "rb", encoding: str | None = None
+     ) -> t.IO[t.AnyStr]:
+@@ -428,7 +444,7 @@ class Flask(App):
+ 
+         :param resource: Path to the resource relative to :attr:`root_path`.
+         :param mode: Open the file in this mode. Only reading is supported,
+-            valid values are ``"r"`` (or ``"rt"``) and ``"rb"``.
++            valid values are ``\"r\"`` (or ``\"rt\"``) and ``\"rb\"``.
+         :param encoding: Open the file with this encoding when opening in text
+             mode. This is ignored when opening in binary mode.
+ 
+@@ -471,7 +487,7 @@ class Flask(App):
+         """Create the Jinja environment based on :attr:`jinja_options`
+         and the various Jinja-related methods of the app. Changing
+         :attr:`jinja_options` after this will have no effect. Also adds
+-        Flask-related globals and filters to the environment.
++        Flask-related globals and functions to the environment.
+ 
+         .. versionchanged:: 0.11
+            ``Environment.auto_reload`` set in accordance with
+@@ -1163,7 +1179,7 @@ class Flask(App):
+             url_adapter = ctx.url_adapter
+             blueprint_name = ctx.request.blueprint
+ 
+-            # If the endpoint starts with "." and the request matches a
++            # If the endpoint starts with \".\" and the request matches a
+             # blueprint, the endpoint is relative to the blueprint.
+             if endpoint[:1] == ".":
+                 if blueprint_name is not None:
+@@ -1437,8 +1453,7 @@ class Flask(App):
+         .. versionchanged:: 3.2
+             All callbacks are called rather than stopping on the first error.
+ 
+-        .. versionchanged:: 0.9
+-            Added the ``exc`` argument.
++        .. versionadded:: 0.9
+         """
+         collect_errors = _CollectErrors()
+ 
+@@ -1490,13 +1505,6 @@ class Flask(App):
+         manually push a context outside of those situations, such as during
+         setup or testing.
+ 
+-        .. code-block:: python
+-
+-            with app.app_context():
+-                init_db()
+-
+-        See :doc:`/appcontext`.
+-
+         .. versionadded:: 0.9
+         """
+         return AppContext(self)
+@@ -1625,4 +1633,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file
+diff --git a/src/flask/helpers.py b/src/flask/helpers.py
+index fb7f6eba3b1a33b30d47aae26a547780da70dc5b..9a96e178f4449a6ad10483118f2b42ecd51d86fc 100644
+--- a/src/flask/helpers.py
++++ b/src/flask/helpers.py
+@@ -379,7 +379,7 @@ def get_flashed_messages(
+     See :doc:`/patterns/flashing` for examples.
+ 
+     .. versionchanged:: 0.3
+-       `with_categories` parameter added.
++       `category_filter` parameter added.
+ 
+     .. versionchanged:: 0.9
+         `category_filter` parameter added.
+@@ -579,10 +579,15 @@ def send_from_directory(
+ 
+     .. versionadded:: 0.5
+     """
+-    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
++    response = werkzeug.utils.send_from_directory(  # type: ignore[return-value]
+         directory, path, **_prepare_send_file_kwargs(**kwargs)
+     )
+ 
++    if current_app.config.get("SEND_STATIC_SECURITY_HEADERS", True):
++        response.headers.setdefault("X-Content-Type-Options", "nosniff")
++
++    return response
++
+ 
+ def get_root_path(import_name: str) -> str:
+     """Find the root path of a package, or the path that contains a
+@@ -679,4 +684,4 @@ class _CollectErrors:
+             if sys.version_info >= (3, 11):
+                 raise BaseExceptionGroup(message, self.errors)  # noqa: F821
+             else:
+-                raise self.errors[0]
++                raise self.errors[0]
+\ No newline at end of file

@@ -1,0 +1,96 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..dce817ebbba8231426874c3bb74cc7e3c30a7820 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,7 +116,7 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+@@ -166,7 +166,7 @@ class Flask(App):
+        The `root_path` parameter was added.
+ 
+     .. versionadded:: 1.0
+-       The ``host_matching`` and ``static_host`` parameters were added.
++       The ``host_matching`` and ``subdomain_matching`` parameters were added.
+ 
+     .. versionadded:: 1.0
+        The ``subdomain_matching`` parameter was added. Subdomain
+@@ -382,13 +382,26 @@ class Flask(App):
+         """
+         value = self.config["SEND_FILE_MAX_AGE_DEFAULT"]
+ 
+-        if value is None:
++        if value is not None:
++            if isinstance(value, timedelta):
++                return int(value.total_seconds())
++
++            return value  # type: ignore[no-any-return]
++
++        # If SEND_FILE_MAX_AGE_DEFAULT is not set, provide a sensible default
++        # cache time based on the file extension.
++        if filename is None:
+             return None
+ 
+-        if isinstance(value, timedelta):
+-            return int(value.total_seconds())
++        ext = os.path.splitext(filename)[1].lower()
++
++        if ext in {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".css", ".js"}:
++            return 3600
+ 
+-        return value  # type: ignore[no-any-return]
++        if ext in {".html", ".htm"}:
++            return 0
++
++        return None
+ 
+     def send_static_file(self, filename: str) -> Response:
+         """The view function used to serve files from
+@@ -974,7 +987,7 @@ class Flask(App):
+ 
+         .. versionchanged:: 0.7
+            This no longer does the exception handling, this code was
+-           moved to the new :meth:`full_dispatch_request`.
++           moved to the new :meth:`full_dispatch_request` method.
+         """
+         req = ctx.request
+ 
+@@ -1505,7 +1518,7 @@ class Flask(App):
+         """Create an :class:`.AppContext` with request information representing
+         the given WSGI environment. A context is automatically pushed when
+         handling each request. When the context is pushed, :data:`.request`,
+-        :data:`.session`, :data:`g:, and :data:`.current_app` become available.
++        :data:`.session`, :data:`g`, and :data:`.current_app` become available.
+ 
+         This method should not be used in your own code. Creating a valid WSGI
+         environ is not trivial. Use :meth:`test_request_context` to correctly
+@@ -1520,7 +1533,7 @@ class Flask(App):
+     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> AppContext:
+         """Create an :class:`.AppContext` with request information created from
+         the given arguments. When the context is pushed, :data:`.request`,
+-        :data:`.session`, :data:`g:, and :data:`.current_app` become available.
++        :data:`.session`, :data:`g`, and :data:`.current_app` become available.
+ 
+         This is useful during testing to run a function that uses request data
+         without dispatching a full request. Use this as a ``with`` block to push
+@@ -1546,7 +1559,7 @@ class Flask(App):
+         :param subdomain: Subdomain name to prepend to :data:`SERVER_NAME`.
+         :param url_scheme: Scheme to use instead of
+             :data:`PREFERRED_URL_SCHEME`.
+-        :param data: The request body text or bytes,or a dict of form data.
++        :param data: The request body text or bytes, or a dict of form data.
+         :param json: If given, this is serialized as JSON and passed as
+             ``data``. Also defaults ``content_type`` to
+             ``application/json``.
+@@ -1625,4 +1638,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file

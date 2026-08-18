@@ -1,0 +1,5 @@
+{
+  "details": {},
+  "error_code": "invalid_model_output",
+  "message": "模型 tool_calls 参数不是 JSON"
+}

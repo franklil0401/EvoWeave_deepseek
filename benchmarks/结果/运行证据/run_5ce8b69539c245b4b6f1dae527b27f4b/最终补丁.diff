@@ -1,0 +1,59 @@
+diff --git a/src/flask/config.py b/src/flask/config.py
+index 34ef1a57217878e21daba0bc4f20ded293a33e7e..e714f9664edbfdb12878ec4562604459d5cf7290 100644
+--- a/src/flask/config.py
++++ b/src/flask/config.py
+@@ -99,7 +99,12 @@ class Config(dict):  # type: ignore[type-arg]
+         super().__init__(defaults or {})
+         self.root_path = root_path
+ 
+-    def from_envvar(self, variable_name: str, silent: bool = False) -> bool:
++    def from_envvar(
++        self,
++        variable_name: str,
++        silent: bool = False,
++        required: bool = False,
++    ) -> bool:
+         """Loads a configuration from an environment variable pointing to
+         a configuration file.  This is basically just a shortcut with nicer
+         error messages for this line of code::
+@@ -109,18 +114,33 @@ class Config(dict):  # type: ignore[type-arg]
+         :param variable_name: name of the environment variable
+         :param silent: set to ``True`` if you want silent failure for missing
+                        files.
++        :param required: set to ``True`` to raise an error if the environment
++                         variable is not set.
+         :return: ``True`` if the file was loaded successfully.
++
++        .. versionchanged:: 3.2.0
++            The ``required`` parameter was added.
+         """
+         rv = os.environ.get(variable_name)
++
+         if not rv:
+             if silent:
+                 return False
++
++            if required:
++                raise RuntimeError(
++                    f"The environment variable {variable_name!r} is required"
++                    " and is not set. Set this variable and make it point"
++                    " to a configuration file"
++                )
++
+             raise RuntimeError(
+                 f"The environment variable {variable_name!r} is not set"
+                 " and as such configuration could not be loaded. Set"
+                 " this variable and make it point to a configuration"
+                 " file"
+             )
++
+         return self.from_pyfile(rv, silent=silent)
+ 
+     def from_prefixed_env(
+@@ -364,4 +384,4 @@ class Config(dict):  # type: ignore[type-arg]
+         return rv
+ 
+     def __repr__(self) -> str:
+-        return f"<{type(self).__name__} {dict.__repr__(self)}>"
++        return f"<{type(self).__name__} {dict.__repr__(self)}>"
+\ No newline at end of file

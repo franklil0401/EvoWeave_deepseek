@@ -1,0 +1,81 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..4c41dcd6da78696f844dd48d85fafe6204074ade 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -208,6 +208,7 @@ class Flask(App):
+         {
+             "DEBUG": None,
+             "TESTING": False,
++            "TESTING_FOLLOW_REDIRECTS": False,
+             "PROPAGATE_EXCEPTIONS": None,
+             "SECRET_KEY": None,
+             "SECRET_KEY_FALLBACKS": None,
+@@ -594,7 +595,7 @@ class Flask(App):
+         """Update the template context with some commonly used variables.
+         This injects request, session, config and g into the template
+         context as well as everything template context processors want
+-        to inject.  Note that the as of Flask 0.6, the original values
++        to inject.  Note that the as of Flask 0.5, the original values
+         in the context will not be overridden if a context processor
+         decides to return a value with the same key.
+ 
+@@ -1034,7 +1035,7 @@ class Flask(App):
+ 
+         Because this means that it might be called as a result of a
+         failure a special safe mode is available which can be enabled
+-        with the `from_error_handler` flag.  If enabled, failures in
++        with the `from_error_handler` flag. If enabled, failures in
+         response processing will be logged and otherwise ignored.
+ 
+         :internal:
+@@ -1505,7 +1506,7 @@ class Flask(App):
+         """Create an :class:`.AppContext` with request information representing
+         the given WSGI environment. A context is automatically pushed when
+         handling each request. When the context is pushed, :data:`.request`,
+-        :data:`.session`, :data:`g:, and :data:`.current_app` become available.
++        :data:`.session`, :data:`g`, and :data:`.current_app` become available.
+ 
+         This method should not be used in your own code. Creating a valid WSGI
+         environ is not trivial. Use :meth:`test_request_context` to correctly
+@@ -1520,7 +1521,7 @@ class Flask(App):
+     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> AppContext:
+         """Create an :class:`.AppContext` with request information created from
+         the given arguments. When the context is pushed, :data:`.request`,
+-        :data:`.session`, :data:`g:, and :data:`.current_app` become available.
++        :data:`.session`, :data:`g`, and :data:`.current_app` become available.
+ 
+         This is useful during testing to run a function that uses request data
+         without dispatching a full request. Use this as a ``with`` block to push
+@@ -1625,4 +1626,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file
+diff --git a/src/flask/testing.py b/src/flask/testing.py
+index 8d058ca00d3d7704678a4b47c01981b939114990..72e0d6655495f4d8c15eb404fdadf43fa92fe38d 100644
+--- a/src/flask/testing.py
++++ b/src/flask/testing.py
+@@ -205,9 +205,13 @@ class FlaskClient(Client):
+         self,
+         *args: t.Any,
+         buffered: bool = False,
+-        follow_redirects: bool = False,
++        follow_redirects: bool | None = None,
+         **kwargs: t.Any,
+     ) -> TestResponse:
++        if follow_redirects is None:
++            follow_redirects = self.application.config.get(
++                "TESTING_FOLLOW_REDIRECTS", False
++            )
+         if args and isinstance(
+             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
+         ):
+@@ -295,4 +299,4 @@ class FlaskCliRunner(CliRunner):
+         if "obj" not in kwargs:
+             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
+ 
+-        return super().invoke(cli, args, **kwargs)
++        return super().invoke(cli, args, **kwargs)
+\ No newline at end of file

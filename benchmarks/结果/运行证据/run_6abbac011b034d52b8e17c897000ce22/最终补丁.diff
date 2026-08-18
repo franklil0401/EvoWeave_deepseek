@@ -1,0 +1,44 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..5588abe7382ffa48acd984b9e6c2249974874647 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -372,6 +372,12 @@ class Flask(App):
+         to ``None``, which tells the browser to use conditional requests
+         instead of a timed cache, which is usually preferable.
+ 
++        If :data:`SEND_FILE_MAX_AGE_DEFAULT` is not set, the value is
++        determined by the file's extension. Known static assets such as
++        images (``.png``, ``.jpg``) and stylesheets (``.css``) are
++        cached for an hour, while ``.html`` files are not cached. Unknown
++        extensions fall back to ``None``.
++
+         Note this is a duplicate of the same method in the Flask
+         class.
+ 
+@@ -383,6 +389,19 @@ class Flask(App):
+         value = self.config["SEND_FILE_MAX_AGE_DEFAULT"]
+ 
+         if value is None:
++            if filename is not None:
++                extension_max_age = {
++                    ".png": 3600,
++                    ".jpg": 3600,
++                    ".jpeg": 3600,
++                    ".css": 3600,
++                    ".html": 0,
++                }
++                ext = os.path.splitext(filename)[1].lower()
++
++                if ext in extension_max_age:
++                    return extension_max_age[ext]
++
+             return None
+ 
+         if isinstance(value, timedelta):
+@@ -1625,4 +1644,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file

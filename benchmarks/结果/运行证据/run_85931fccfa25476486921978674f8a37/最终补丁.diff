@@ -1,0 +1,37 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..f3084e6007511d2b60854d712a95768efb08fc56 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -862,9 +862,24 @@ class Flask(App):
+ 
+         handler = self._find_error_handler(e, ctx.request.blueprints)
+         if handler is None:
+-            return e
++            return self.make_http_error_response(ctx, e)
+         return self.ensure_sync(handler)(e)  # type: ignore[no-any-return]
+ 
++    def make_http_error_response(
++        self, ctx: AppContext, e: HTTPException
++    ) -> HTTPException:
++        """Return the response for an HTTP exception that does not have a
++        registered error handler.
++
++        This is called by :meth:`handle_http_exception` for HTTP
++        exceptions that are not handled by an explicit error handler.
++        Override this method to customize the default response format,
++        such as rendering a uniform error page template.
++
++        .. versionadded:: 3.2
++        """
++        return e
++
+     def handle_user_exception(
+         self, ctx: AppContext, e: Exception
+     ) -> HTTPException | ft.ResponseReturnValue:
+@@ -1625,4 +1640,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file

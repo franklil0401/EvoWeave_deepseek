@@ -1,0 +1,17 @@
+{
+  "details": {
+    "direct_errors": [
+      {
+        "ctx": {
+          "error": "EOF while parsing a value at line 1 column 0"
+        },
+        "input": "",
+        "loc": [],
+        "msg": "Invalid JSON: EOF while parsing a value at line 1 column 0",
+        "type": "json_invalid"
+      }
+    ]
+  },
+  "error_code": "invalid_model_output",
+  "message": "模型输出不符合 Worker 决策协议"
+}

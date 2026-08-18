@@ -1,0 +1,74 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..5e14ce715b73b13db42f6d753153eb29a54332c2 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,7 +116,7 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+@@ -166,7 +166,7 @@ class Flask(App):
+        The `root_path` parameter was added.
+ 
+     .. versionadded:: 1.0
+-       The ``host_matching`` and ``static_host`` parameters were added.
++       The ``host_matching`` and ``subdomain_matching`` parameters were added.
+ 
+     .. versionadded:: 1.0
+        The ``subdomain_matching`` parameter was added. Subdomain
+@@ -383,6 +383,15 @@ class Flask(App):
+         value = self.config["SEND_FILE_MAX_AGE_DEFAULT"]
+ 
+         if value is None:
++            if filename is not None:
++                ext = os.path.splitext(filename)[1].lower()
++
++                if ext in {".png", ".jpg", ".css"}:
++                    return 3600
++
++                if ext == ".html":
++                    return 0
++
+             return None
+ 
+         if isinstance(value, timedelta):
+@@ -763,7 +772,7 @@ class Flask(App):
+         application code, you must set ``app.testing = True`` in order for the
+         exceptions to propagate to the test client.  Otherwise, the exception
+         will be handled by the application (not visible to the test client) and
+-        the only indication of an AssertionError or other exception will be a
++        the only indication of an AssertionError or other exception would be a
+         500 status code response to the test client.  See the :attr:`testing`
+         attribute.  For example::
+ 
+@@ -1267,7 +1276,7 @@ class Flask(App):
+ 
+             :func:`callable`
+                 The function is called as a WSGI application. The result is
+-                used to create a response object.
++                used to create a response.
+ 
+         .. versionchanged:: 2.2
+             A generator will be converted to a streaming response.
+@@ -1523,8 +1532,8 @@ class Flask(App):
+         :data:`.session`, :data:`g:, and :data:`.current_app` become available.
+ 
+         This is useful during testing to run a function that uses request data
+-        without dispatching a full request. Use this as a ``with`` block to push
+-        a context.
++        without dispatching a full request. Use this as a ``with`` block to
++        push a context.
+ 
+         .. code-block:: python
+ 
+@@ -1625,4 +1634,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file

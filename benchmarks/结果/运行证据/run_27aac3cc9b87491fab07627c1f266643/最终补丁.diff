@@ -1,0 +1,67 @@
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 6203586958fedf21edd86e95874d22571af34fb9..390509cd8f3313c355822d84b8d02edded6a3ee1 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -116,7 +116,7 @@ class Flask(App):
+     The name of the package is used to resolve resources from inside the
+     package or the folder the module is contained in depending on if the
+     package parameter resolves to an actual python package (a folder with
+-    an :file:`__init__.py` file inside) or a standard module (just a ``.py`` file).
++    an :file:`__init__.py` file inside) or a standard module (a ``.py`` file).
+ 
+     For more information about resource loading, see :func:`open_resource`.
+ 
+@@ -166,7 +166,7 @@ class Flask(App):
+        The `root_path` parameter was added.
+ 
+     .. versionadded:: 1.0
+-       The ``host_matching`` and ``static_host`` parameters were added.
++       The ``host_matching`` and ``subdomain_matching`` parameters were added.
+ 
+     .. versionadded:: 1.0
+        The ``subdomain_matching`` parameter was added. Subdomain
+@@ -372,6 +372,12 @@ class Flask(App):
+         to ``None``, which tells the browser to use conditional requests
+         instead of a timed cache, which is usually preferable.
+ 
++        If :data:`SEND_FILE_MAX_AGE_DEFAULT` is not set, a default is
++        returned based on the file's extension: assets such as ``.png``,
++        ``.jpg``, and ``.css`` are cached for an hour, while ``.html``
++        files are not cached at all. Files with an unknown extension
++        continue to return ``None``.
++
+         Note this is a duplicate of the same method in the Flask
+         class.
+ 
+@@ -383,6 +389,15 @@ class Flask(App):
+         value = self.config["SEND_FILE_MAX_AGE_DEFAULT"]
+ 
+         if value is None:
++            if filename is not None:
++                ext = os.path.splitext(filename)[1].lower()
++
++                if ext in {".png", ".jpg", ".jpeg", ".css"}:
++                    return 3600
++
++                if ext == ".html":
++                    return 0
++
+             return None
+ 
+         if isinstance(value, timedelta):
+@@ -975,6 +990,8 @@ class Flask(App):
+         .. versionchanged:: 0.7
+            This no longer does the exception handling, this code was
+            moved to the new :meth:`full_dispatch_request`.
++
++        .. versionadded:: 0.6
+         """
+         req = ctx.request
+ 
+@@ -1625,4 +1642,4 @@ class Flask(App):
+         WSGI application. This calls :meth:`wsgi_app`, which can be
+         wrapped to apply middleware.
+         """
+-        return self.wsgi_app(environ, start_response)
++        return self.wsgi_app(environ, start_response)
+\ No newline at end of file
